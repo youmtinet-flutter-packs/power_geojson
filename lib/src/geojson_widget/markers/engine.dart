@@ -3,6 +3,7 @@ import 'package:enhanced_future_builder/enhanced_future_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:http/http.dart';
 import 'package:power_geojson/power_geojson.dart';
 export 'properties.dart';
@@ -96,7 +97,7 @@ Widget _defaultMarkerBuilder(BuildContext context,
 ///
 /// Returns a widget representing the markers generated from the GeoJSON data.
 Future<Widget> _fileMarkers(
-  String path, {
+  File file, {
   required MarkerProperties markerLayerProperties,
   required Widget Function(
     BuildContext context,
@@ -105,20 +106,22 @@ Future<Widget> _fileMarkers(
   )? builder,
   MapController? mapController,
   Key? key,
+  required PowerMarkerClusterOptions? powerClusterOptions,
+  required Widget Function(int? statusCode)? fallback,
 }) async {
-  final file = File(path);
   var exists = await file.exists();
   if (exists) {
     var readAsString = await file.readAsString();
     return _string(
       checkEsri(readAsString),
+      powerClusterOptions: powerClusterOptions,
       markerProperties: markerLayerProperties,
       mapController: mapController,
       key: key,
       builder: builder,
     );
   } else {
-    return const SizedBox();
+    return fallback?.call(null) ?? const Text('Not Found');
   }
 }
 
@@ -161,11 +164,13 @@ Future<Widget> _memoryMarkers(
   )? builder,
   MapController? mapController,
   Key? key,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
   File file = File.fromRawPath(list);
   var string = await file.readAsString();
   return _string(
     checkEsri(string),
+    powerClusterOptions: powerClusterOptions,
     markerProperties: markerLayerProperties,
     mapController: mapController,
     key: key,
@@ -206,16 +211,16 @@ Future<Widget> _assetMarkers(
   String path, {
   required MarkerProperties markerProperties,
   MapController? mapController,
-  required Widget Function(
-    BuildContext context,
-    MarkerProperties markerProperties,
-    Map<String, dynamic>? map,
-  )? builder,
+  required Widget Function(BuildContext context,
+          MarkerProperties markerProperties, Map<String, dynamic>? map)?
+      builder,
   Key? key,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
   final string = await rootBundle.loadString(path);
   return _string(
     checkEsri(string),
+    powerClusterOptions: powerClusterOptions,
     markerProperties: markerProperties,
     mapController: mapController,
     key: key,
@@ -269,19 +274,25 @@ Future<Widget> _networkMarkers(
     Map<String, dynamic>? map,
   )? builder,
   MapController? mapController,
+  required Widget Function(int? statusCode)? fallback,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
   var method = client == null ? get : client.get;
   var response = await method(urlString, headers: headers);
   var string = response.body;
-  return statusCodes.contains(response.statusCode)
-      ? _string(
-          checkEsri(string),
-          markerProperties: markerLayerProperties,
-          mapController: mapController,
-          key: key,
-          builder: builder,
-        )
-      : Text('${response.statusCode}');
+  if (statusCodes.contains(response.statusCode)) {
+    return _string(
+      checkEsri(string),
+      powerClusterOptions: powerClusterOptions,
+      markerProperties: markerLayerProperties,
+      mapController: mapController,
+      key: key,
+      builder: builder,
+    );
+  } else {
+    return fallback?.call(response.statusCode) ??
+        Text('${response.statusCode}');
+  }
 }
 
 /// Parses a GeoJSON string and generates a marker layer with markers based on the GeoJSON data.
@@ -324,32 +335,45 @@ Widget _string(
   required MarkerProperties markerProperties,
   // Other properties
   MapController? mapController,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) {
-  final geojson = PowerGeoJSONFeatureCollection.fromJson(checkEsri(string));
+  PowerGeoJSONFeatureCollection geojson =
+      PowerGeoJSONFeatureCollection.fromJson(checkEsri(string));
 
-  var markers = geojson.geoJSONPoints.map(
+  List<PowerMarker> markers = geojson.geoJSONPoints.map(
     (e) {
-      return e.geometry.coordinates.toMarker(
+      return e.geometry.coordinates.toPowerMarker(
         markerProperties:
             MarkerProperties.fromMap(e.properties, markerProperties),
-        child: Builder(builder: (context) {
-          return (builder ?? _defaultMarkerBuilder)(
-              context, markerProperties, e.properties);
-        }),
+        properties: e.properties,
+        child: Builder(
+          builder: (context) {
+            return (builder ?? _defaultMarkerBuilder)(
+              context,
+              markerProperties,
+              e.properties,
+            );
+          },
+        ),
       );
     },
   ).toList();
 
   List<List<double>?> bbox = geojson.geoJSONPoints.map((e) => e.bbox).toList();
   zoomTo(bbox, mapController);
-
-  Marker firstMarker = markers.first;
-  return MarkerLayer(
-    markers: markers,
-    rotate: firstMarker.rotate ?? false,
-    alignment: firstMarker.alignment ?? Alignment.bottomCenter,
-    key: key,
-  );
+  if (powerClusterOptions != null) {
+    return MarkerClusterLayerWidget(
+      options:
+          powerClusterOptions.toClusterOptions(powerClusterOptions, markers),
+    );
+  } else {
+    return MarkerLayer(
+      markers: markers,
+      rotate: markerProperties.rotate ?? false,
+      alignment: markerProperties.rotateAlignment ?? Alignment.center,
+      key: key,
+    );
+  }
 }
 
 /// A utility class for fetching and rendering markers from various sources.
@@ -453,17 +477,21 @@ class PowerGeoJSONMarkers {
     required MarkerProperties markerProperties,
     MapController? mapController,
     Key? key,
+    Widget Function(int? statusCode)? fallback,
+    PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     var uriString = url.toUri();
     return EnhancedFutureBuilder(
       future: _networkMarkers(
         uriString,
+        powerClusterOptions: powerClusterOptions,
         headers: headers,
         client: client,
         statusCodes: statusCodes,
         markerLayerProperties: markerProperties,
         builder: builder,
         mapController: mapController,
+        fallback: fallback,
         key: key,
       ),
       rememberFutureResult: true,
@@ -518,10 +546,12 @@ class PowerGeoJSONMarkers {
             Map<String, dynamic>? map)?
         builder,
     Key? key,
+    PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     return EnhancedFutureBuilder(
       future: _assetMarkers(
         url,
+        powerClusterOptions: powerClusterOptions,
         markerProperties: markerProperties,
         mapController: mapController,
         builder: builder,
@@ -575,20 +605,24 @@ class PowerGeoJSONMarkers {
   /// Returns a [FutureBuilder] widget that will build the marker widget once the file
   /// is loaded.
   static Widget file(
-    String path, {
+    File file, {
     required MarkerProperties markerProperties,
     MapController? mapController,
     Key? key,
     Widget Function(BuildContext context, MarkerProperties markerProperties,
             Map<String, dynamic>? map)?
         builder,
+    Widget Function(int? statusCode)? fallback,
+    PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     return EnhancedFutureBuilder(
       future: _fileMarkers(
-        path,
+        file,
+        powerClusterOptions: powerClusterOptions,
         markerLayerProperties: markerProperties,
         mapController: mapController,
         builder: builder,
+        fallback: fallback,
         key: key,
       ),
       rememberFutureResult: true,
@@ -646,10 +680,12 @@ class PowerGeoJSONMarkers {
     Widget Function(BuildContext context, MarkerProperties markerProperties,
             Map<String, dynamic>? map)?
         builder,
+    PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     return EnhancedFutureBuilder(
       future: _memoryMarkers(
         bytes,
+        powerClusterOptions: powerClusterOptions,
         markerLayerProperties: markerLayerProperties,
         mapController: mapController,
         builder: builder,
@@ -705,12 +741,14 @@ class PowerGeoJSONMarkers {
     required MarkerProperties markerProperties,
     MapController? mapController,
     Key? key,
+    PowerMarkerClusterOptions? powerClusterOptions,
     Widget Function(BuildContext context, MarkerProperties markerProperties,
             Map<String, dynamic>? properties)?
         builder,
   }) {
     return _string(
       data,
+      powerClusterOptions: powerClusterOptions,
       markerProperties: markerProperties,
       key: key,
       builder: builder,

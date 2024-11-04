@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:http/http.dart';
 import 'package:power_geojson/power_geojson.dart';
 export 'properties.dart';
@@ -61,18 +63,18 @@ Future<Widget> _fileFeatureCollections(
       builder,
   required Future<String> Function(String filePath) fileLoadBuilder,
   MapController? mapController,
-  bool polylineCulling = false,
   bool polygonCulling = false,
   Key? key,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
   final readAsString = await fileLoadBuilder(path);
   return _string(
     checkEsri(readAsString),
+    powerClusterOptions: powerClusterOptions,
     featureCollectionPropertie: featureCollectionLayerProperties,
     mapController: mapController,
     key: key,
     polygonCulling: polygonCulling,
-    polylineCulling: polylineCulling,
     builder: builder,
   );
 }
@@ -100,19 +102,19 @@ Future<Widget> _memoryFeatureCollections(
           Map<String, dynamic>? map)
       builder,
   MapController? mapController,
-  bool polylineCulling = false,
   bool polygonCulling = false,
   Key? key,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
   File file = File.fromRawPath(list);
   var string = await file.readAsString();
   return _string(
     checkEsri(string),
+    powerClusterOptions: powerClusterOptions,
     featureCollectionPropertie: featureCollectionLayerProperties,
     mapController: mapController,
     key: key,
     polygonCulling: polygonCulling,
-    polylineCulling: polylineCulling,
     builder: builder,
   );
 }
@@ -135,7 +137,6 @@ Future<Widget> _memoryFeatureCollections(
 Future<Widget> _assetFeatureCollections(
   String path, {
   required FeatureCollectionProperties featureCollectionProperties,
-  bool polylineCulling = false,
   bool polygonCulling = false,
   MapController? mapController,
   required Widget Function(
@@ -143,15 +144,16 @@ Future<Widget> _assetFeatureCollections(
           Map<String, dynamic>? map)
       builder,
   Key? key,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
   final string = await rootBundle.loadString(path);
   return _string(
     checkEsri(string),
+    powerClusterOptions: powerClusterOptions,
     featureCollectionPropertie: featureCollectionProperties,
     mapController: mapController,
     key: key,
     polygonCulling: polygonCulling,
-    polylineCulling: polylineCulling,
     builder: builder,
   );
 }
@@ -180,7 +182,6 @@ Future<Widget> _networkFeatureCollections(
   Key? key,
   Client? client,
   Map<String, String>? headers,
-  bool polylineCulling = false,
   bool polygonCulling = false,
   required Widget Function(
           FeatureCollectionProperties featureCollectionProperties,
@@ -190,15 +191,16 @@ Future<Widget> _networkFeatureCollections(
           Client? client, Uri uri, Map<String, String>? map)
       networkLoadBuilder,
   MapController? mapController,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
   String string = await networkLoadBuilder(client, uri, headers);
   return _string(
     checkEsri(string),
+    powerClusterOptions: powerClusterOptions,
     featureCollectionPropertie: featureCollectionProperties,
     mapController: mapController,
     key: key,
     polygonCulling: polygonCulling,
-    polylineCulling: polylineCulling,
     builder: builder,
   );
 }
@@ -223,19 +225,20 @@ Widget _string(
   Key? key,
   required Widget Function(
           FeatureCollectionProperties featureCollectionProperties,
-          Map<String, dynamic>? map)
+          Map<String, Object?>? map)
       builder,
   required FeatureCollectionProperties featureCollectionPropertie,
-  bool polylineCulling = false,
   bool polygonCulling = false,
   MapController? mapController,
+  required PowerMarkerClusterOptions? powerClusterOptions,
 }) {
   PowerGeoJSONFeatureCollection parseGeoJSON =
       PowerGeoJSONFeatureCollection.fromJson(checkEsri(json));
-  var points = parseGeoJSON.geoJSONPoints
+  List<PowerMarker> powerMarkers = parseGeoJSON.geoJSONPoints
       .map(
-        (e) => e.geometry.coordinates.toMarker(
+        (e) => e.geometry.coordinates.toPowerMarker(
           markerProperties: featureCollectionPropertie.markerProperties,
+          properties: e.properties,
           child: builder(
             featureCollectionPropertie,
             e.properties,
@@ -243,15 +246,22 @@ Widget _string(
         ),
       )
       .toList();
-  var firstMarker = points.firstOrNull;
   return Stack(
     key: key,
     children: [
-      MarkerLayer(
-        rotate: firstMarker?.rotate ?? false,
-        alignment: firstMarker?.alignment ?? Alignment.bottomCenter,
-        markers: points,
-      ),
+      if (powerClusterOptions != null)
+        MarkerClusterLayerWidget(
+          options: powerClusterOptions.toClusterOptions(
+              powerClusterOptions, powerMarkers),
+        )
+      else
+        MarkerLayer(
+          rotate: featureCollectionPropertie.markerProperties.rotate ?? false,
+          alignment:
+              featureCollectionPropertie.markerProperties.rotateAlignment ??
+                  Alignment.center,
+          markers: powerMarkers,
+        ),
       PolylineLayer(
         polylines: parseGeoJSON.geoJSONLineStrings
             .map(
@@ -261,7 +271,6 @@ Widget _string(
               ),
             )
             .toList(),
-        polylineCulling: polylineCulling,
       ),
       PolygonLayer(
         polygons: parseGeoJSON.geoJSONPolygons
@@ -303,23 +312,23 @@ class PowerGeoJSONFeatureCollections {
       Map<String, dynamic>? map,
     ) builder,
     required FeatureCollectionProperties featureCollectionProperties,
-    bool polylineCulling = false,
     bool polygonCulling = false,
     MapController? mapController,
     Future<String> Function(Client? client, Uri uri, Map<String, String>? map)?
         networkLoadBuilder,
     Key? key,
+    PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     var uri = url.toUri();
     return _networkFeatureCollections(
       uri,
+      powerClusterOptions: powerClusterOptions,
       headers: headers,
       client: client,
       featureCollectionProperties: featureCollectionProperties,
       networkLoadBuilder: networkLoadBuilder ?? _defaultNetworkLoader,
       builder: builder,
       polygonCulling: polygonCulling,
-      polylineCulling: polygonCulling,
       mapController: mapController,
       key: key,
     );
@@ -340,7 +349,6 @@ class PowerGeoJSONFeatureCollections {
   static Future<Widget> asset(
     String url, {
     required FeatureCollectionProperties featureCollectionProperties,
-    bool polylineCulling = false,
     bool polygonCulling = false,
     MapController? mapController,
     required Widget Function(
@@ -348,13 +356,14 @@ class PowerGeoJSONFeatureCollections {
             Map<String, dynamic>? map)
         builder,
     Key? key,
+    PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     return _assetFeatureCollections(
       url,
+      powerClusterOptions: powerClusterOptions,
       featureCollectionProperties: featureCollectionProperties,
       mapController: mapController,
       polygonCulling: polygonCulling,
-      polylineCulling: polygonCulling,
       builder: builder,
       key: key,
     );
@@ -376,7 +385,6 @@ class PowerGeoJSONFeatureCollections {
   static Future<Widget> file(
     String path, {
     required FeatureCollectionProperties featureCollectionProperties,
-    bool polylineCulling = false,
     bool polygonCulling = false,
     MapController? mapController,
     Key? key,
@@ -385,14 +393,15 @@ class PowerGeoJSONFeatureCollections {
             FeatureCollectionProperties featureCollectionProperties,
             Map<String, dynamic>? map)
         builder,
+    PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     return _fileFeatureCollections(
       path,
+      powerClusterOptions: powerClusterOptions,
       featureCollectionLayerProperties: featureCollectionProperties,
       mapController: mapController,
       builder: builder,
       polygonCulling: polygonCulling,
-      polylineCulling: polygonCulling,
       fileLoadBuilder: fileLoadBuilder ?? _defaultFileLoadBuilder,
       key: key,
     );
@@ -415,19 +424,19 @@ class PowerGeoJSONFeatureCollections {
     required FeatureCollectionProperties featureCollectionLayerProperties,
     MapController? mapController,
     Key? key,
-    bool polylineCulling = false,
     bool polygonCulling = false,
     required Widget Function(
-            FeatureCollectionProperties featureCollectionProperties,
-            Map<String, dynamic>? map)
-        builder,
+      FeatureCollectionProperties featureCollectionProperties,
+      Map<String, dynamic>? map,
+    ) builder,
+    PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     return _memoryFeatureCollections(
       bytes,
+      powerClusterOptions: powerClusterOptions,
       featureCollectionLayerProperties: featureCollectionLayerProperties,
       mapController: mapController,
       polygonCulling: polygonCulling,
-      polylineCulling: polygonCulling,
       builder: builder,
       key: key,
     );
@@ -448,10 +457,10 @@ class PowerGeoJSONFeatureCollections {
   static Widget string(
     String data, {
     required FeatureCollectionProperties featureCollectionProperties,
-    bool polylineCulling = false,
     bool polygonCulling = false,
     MapController? mapController,
     Key? key,
+    required PowerMarkerClusterOptions? powerClusterOptions,
     required Widget Function(
             FeatureCollectionProperties featureCollectionProperties,
             Map<String, dynamic>? properties)
@@ -459,11 +468,11 @@ class PowerGeoJSONFeatureCollections {
   }) {
     return _string(
       data,
+      powerClusterOptions: powerClusterOptions,
       featureCollectionPropertie: featureCollectionProperties,
       key: key,
       builder: builder,
       polygonCulling: polygonCulling,
-      polylineCulling: polygonCulling,
       mapController: mapController,
     );
   }

@@ -14,7 +14,7 @@ class AssetGeoJSONPolygon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONPolygons.asset(
-      "assets/geojsons/assets_polygons.geojson",
+      "assets/polygons.geojson",
       /* bufferOptions: BufferOptions(
         buffer: 300,
         buffersOnly: false,
@@ -26,7 +26,6 @@ class AssetGeoJSONPolygon extends StatelessWidget {
         ),
       ), */
       polygonProperties: const PolygonProperties(
-        isDotted: true,
         label: 'Asset',
         fillColor: Color(0xFFA29A0A),
         rotateLabel: true,
@@ -41,39 +40,9 @@ class AssetGeoJSONPolygon extends StatelessWidget {
         ),
         labeled: true,
         layerProperties: {
-          LayerPolygonIndexes.label: 'FID',
+          LayerPolygonIndexes.label: 'Name',
           LayerPolygonIndexes.borderStokeWidth: 'FID',
         },
-      ),
-      mapController: _mapController,
-    );
-  }
-}
-
-class AssetGeoJSONMultiPolygon extends StatelessWidget {
-  const AssetGeoJSONMultiPolygon({
-    Key? key,
-    MapController? mapController,
-  })  : _mapController = mapController,
-        super(key: key);
-
-  final MapController? _mapController;
-
-  @override
-  Widget build(BuildContext context) {
-    return PowerGeoJSONPolygons.asset(
-      "assets/geojsons/assets_polygonsmultiples.geojson",
-      polygonProperties: const PolygonProperties(
-        isDotted: false,
-        label: 'Asset Multipolygons',
-        fillColor: Color(0xFFA29A0A),
-        rotateLabel: true,
-        labelStyle: TextStyle(
-          fontSize: 6,
-          decoration: TextDecoration.underline,
-        ),
-        labeled: true,
-        layerProperties: {LayerPolygonIndexes.fillColor: 'color'},
       ),
       mapController: _mapController,
     );
@@ -92,10 +61,9 @@ class AssetGeoJSONZones extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONPolygons.asset(
-      "assets/geojsons/zonestypes.geojson",
+      "assets/morocco.geojson",
       polygonProperties: const PolygonProperties(
-        isDotted: false,
-        fillColor: Color(0xFFA29A0A),
+        fillColor: Color(0x66A29A0A),
         rotateLabel: true,
         labelStyle: TextStyle(
           fontStyle: FontStyle.italic,

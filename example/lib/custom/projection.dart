@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class PerojectionFlutterMap extends StatefulWidget {
   const PerojectionFlutterMap({Key? key}) : super(key: key);
@@ -16,21 +19,33 @@ class _PerojectionFlutterMapState extends State<PerojectionFlutterMap> {
 }
 
 class CrsCustom extends Crs {
-  @override
-  String get code => throw UnimplementedError();
+  const CrsCustom({required super.code, required super.infinite});
 
   @override
-  bool get infinite => throw UnimplementedError();
+  Bounds<double>? getProjectedBounds(double zoom) {
+    throw UnimplementedError();
+  }
+
+  @override
+  (double, double) latLngToXY(LatLng latlng, double scale) {
+    throw UnimplementedError();
+  }
+
+  @override
+  LatLng pointToLatLng(Point<num> point, double zoom) {
+    throw UnimplementedError();
+  }
+
+  @override
+  (double, double) transform(double x, double y, double scale) {
+    throw UnimplementedError();
+  }
+
+  @override
+  (double, double) untransform(double x, double y, double scale) {
+    throw UnimplementedError();
+  }
 
   @override
   Projection get projection => throw UnimplementedError();
-
-  @override
-  Transformation get transformation => throw UnimplementedError();
-
-  @override
-  (double, double)? get wrapLat => throw UnimplementedError();
-
-  @override
-  (double, double)? get wrapLng => throw UnimplementedError();
 }

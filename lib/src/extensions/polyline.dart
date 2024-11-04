@@ -14,7 +14,7 @@ extension PolylineXX on List<List<double>> {
       color: polylineProperties.color,
       borderColor: polylineProperties.borderColor,
       borderStrokeWidth: polylineProperties.borderStrokeWidth,
-      isDotted: polylineProperties.isDotted,
+      pattern: polylineProperties.isDotted,
       strokeCap: polylineProperties.strokeCap,
       strokeJoin: polylineProperties.strokeJoin,
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:power_geojson/power_geojson.dart';
 import 'package:power_geojson_example/lib.dart';
 
@@ -16,41 +17,32 @@ class NetworkGeoJSONMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONMarkers.network(
-      "$url/others/network_points.json",
-      markerProperties: const MarkerProperties(),
-      /* builder: (context, markerProperties, mapProperties) {
-        return SvgPicture.asset(
-          "assets/icons/position.svg",
-          color: HexColor.fromHex(mapProperties['color'], const Color(0xFFFFF238)),
-        );
-      }, */
-      mapController: _mapController,
-    );
-  }
-}
-
-class NetworkGeoJSONMultiMarker extends StatelessWidget {
-  const NetworkGeoJSONMultiMarker({
-    Key? key,
-    MapController? mapController,
-  })  : _mapController = mapController,
-        super(key: key);
-
-  final MapController? _mapController;
-
-  @override
-  Widget build(BuildContext context) {
-    return PowerGeoJSONMarkers.network(
-      "$url/others/network_pointsmultiples.json",
+      "$url/network/points.geojson",
       markerProperties: const MarkerProperties(),
       builder: (context, markerProperties, mapProperties) {
-        var mapProperties2 = mapProperties ?? {};
         return SvgPicture.asset(
           "assets/icons/position.svg",
-          color: HexColor.fromHex(
-            mapProperties2['color'],
-            const Color(0xFF0FE24E),
+          theme: SvgTheme(
+            currentColor: HexColor.fromHex(
+              mapProperties?['color'],
+              const Color(0xFF541b82),
+            ),
           ),
+        );
+      },
+      fallback: (int? statusCode) {
+        return const MarkerLayer(
+          markers: [
+            Marker(
+              point: LatLng(33.926447747065936, -2.9228343908943998),
+              width: 160,
+              height: 60,
+              child: Text(
+                'Network Markers Not Found',
+                style: TextStyle(fontSize: 8, color: Colors.yellow),
+              ),
+            ),
+          ],
         );
       },
       mapController: _mapController,

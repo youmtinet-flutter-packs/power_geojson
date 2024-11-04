@@ -1,0 +1,4 @@
+{
+  "type" : "FeatureCollection",
+  "features" : [{"type":"Feature","id":1,"geometry":{"type":"Point","coordinates":[-7.7053682251646514,33.57698844818308]},"properties":{"OBJECTID":1,"Name":"Morocco Mall"}},{"type":"Feature","id":2,"geometry":{"type":"Point","coordinates":[-7.6465789848136403,33.549674533193695]},"properties":{"OBJECTID":2,"Name":"ONCF"}},{"type":"Feature","id":3,"geometry":{"type":"Point","coordinates":[-7.6514378850488445,33.547155712977769]},"properties":{"OBJECTID":3,"Name":"EHTP"}},{"type":"Feature","id":4,"geometry":{"type":"Point","coordinates":[-7.3827763183557549,33.694988502956384]},"properties":{"OBJECTID":4,"Name":"Mohammedia"}},{"type":"Feature","id":5,"geometry":{"type":"Point","coordinates":[-7.5898176759451443,33.590060675887088]},"properties":{"OBJECTID":5,"Name":"Casa Voyageurs"}}]
+}

@@ -73,7 +73,7 @@ class PolygonProperties {
   static const bool defLabeled = false;
 
   /// Default value indicating whether polygons are rendered as dotted lines.
-  static const bool defIsDotted = false;
+  static const StrokePattern defIsDotted = StrokePattern.solid();
 
   /// Default label placement for polygons.
   static const PolygonLabelPlacement defLabelPlacement =
@@ -92,7 +92,7 @@ class PolygonProperties {
   static const StrokeJoin defStrokeJoin = StrokeJoin.round;
 
   /// The fill color of polygons.
-  final Color fillColor;
+  final Color? fillColor;
 
   /// The label associated with polygons.
   final String label;
@@ -103,7 +103,6 @@ class PolygonProperties {
   /// The border/stroke color of polygons.
   final Color borderColor;
 
-  /// Indicates whether polygons should be filled.
   final bool isFilled;
 
   /// Indicates whether holes should disable their border.
@@ -113,7 +112,7 @@ class PolygonProperties {
   final bool labeled;
 
   /// Indicates whether polygons are rendered as dotted lines.
-  final bool isDotted;
+  final StrokePattern pattern;
 
   /// The polygon layer properties.
   final Map<LayerPolygonIndexes, String>? layerProperties;
@@ -153,7 +152,7 @@ class PolygonProperties {
   const PolygonProperties({
     this.layerProperties,
     this.labeled = PolygonProperties.defLabeled,
-    this.isDotted = PolygonProperties.defIsDotted,
+    this.pattern = PolygonProperties.defIsDotted,
     this.labelPlacement = PolygonProperties.defLabelPlacement,
     this.labelStyle = PolygonProperties.defLabelStyle,
     this.rotateLabel = PolygonProperties.defRotateLabel,
@@ -198,8 +197,9 @@ class PolygonProperties {
           layerProperties[LayerPolygonIndexes.fillColor];
       var isFilledMap = keyPropertieFillColor != null;
       String hexString = '${properties[keyPropertieFillColor]}';
-      final Color fillColor =
-          HexColor.fromHex(hexString, polygonLayerProperties.fillColor);
+      Color? polyLayProp = polygonLayerProperties.fillColor;
+      final Color? fillColor =
+          polyLayProp == null ? null : HexColor.fromHex(hexString, polyLayProp);
       // border color
       final String? layerPropertieBorderColor =
           layerProperties[LayerPolygonIndexes.borderColor];
@@ -225,7 +225,7 @@ class PolygonProperties {
         label: label2,
         labeled: isLabelled,
         disableHolesBorder: polygonLayerProperties.disableHolesBorder,
-        isDotted: polygonLayerProperties.isDotted,
+        pattern: polygonLayerProperties.pattern,
         labelPlacement: polygonLayerProperties.labelPlacement,
         labelStyle: polygonLayerProperties.labelStyle,
         rotateLabel: polygonLayerProperties.rotateLabel,

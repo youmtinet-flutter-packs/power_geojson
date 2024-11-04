@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:power_geojson/power_geojson.dart';
 
 enum LayerPolylineIndexes {
@@ -11,7 +12,7 @@ class PolylineProperties {
   static const defFillColor = Color(0x9C2195F3);
   static const double defBorderStokeWidth = 2;
   static const Color defBorderColor = Color(0xFF1E00FD);
-  static const bool defIsDotted = false;
+  static const StrokePattern defIsDotted = StrokePattern.solid();
   static const bool defUseStrokeWidthInMeter = false;
   static const StrokeCap defStrokeCap = StrokeCap.round;
   static const StrokeJoin defStrokeJoin = StrokeJoin.round;
@@ -22,10 +23,10 @@ class PolylineProperties {
   final double strokeWidth;
   final Color color;
   final double borderStrokeWidth;
-  final Color? borderColor;
+  final Color borderColor;
   final List<Color>? gradientColors;
   final List<double>? colorsStop;
-  final bool isDotted;
+  final StrokePattern isDotted;
   final StrokeCap strokeCap;
   final StrokeJoin strokeJoin;
   final bool useStrokeWidthInMeter;
@@ -47,9 +48,8 @@ class PolylineProperties {
       final String? keyPropertieBorderColor =
           layerProperties[LayerPolylineIndexes.borderColor];
       String hexString2 = '${properties[keyPropertieBorderColor]}';
-      var fall = polylineProperties.borderColor;
-      final Color? borderColor =
-          fall == null ? null : HexColor.fromHex(hexString2, fall);
+      Color fall = polylineProperties.borderColor;
+      final Color borderColor = HexColor.fromHex(hexString2, fall);
       // border width
       var keyPropertieBWidth =
           layerProperties[LayerPolylineIndexes.strokeWidth];

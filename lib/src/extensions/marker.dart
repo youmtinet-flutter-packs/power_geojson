@@ -5,19 +5,20 @@ import 'package:flutter/material.dart';
 
 extension MarkerXX on List<double> {
   /// Converts a list coords of point into a [Marker]
-  Marker toMarker({
+  PowerMarker toPowerMarker({
     required MarkerProperties markerProperties,
+    required Map<String, Object?>? properties,
     required Widget child,
   }) {
-    var marker = Marker(
+    return PowerMarker(
       height: markerProperties.height,
       width: markerProperties.width,
       rotate: markerProperties.rotate,
       child: child,
-      alignment: markerProperties.rotateAlignment,
+      alignment: markerProperties.rotateAlignment ?? Alignment.center,
       key: markerProperties.key,
+      properties: properties,
       point: LatLng(this[1], this[0]),
     );
-    return marker;
   }
 }

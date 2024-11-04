@@ -32,7 +32,7 @@ import 'package:power_geojson/power_geojson.dart';
 ///     } else if (snapshot.connectionState == ConnectionState.waiting) {
 ///       return const Center(child: CircularProgressIndicator());
 ///     }
-///     return const Text('Error loading polylines');
+///     return const text('Error loading polylines');
 ///   },
 /// )
 /// ```
@@ -40,21 +40,20 @@ import 'package:power_geojson/power_geojson.dart';
 /// The [polylineCulling] parameter allows you to enable or disable culling of
 /// polylines that are outside the map's viewport, improving performance.
 ///
-/// If the file specified by [path] does not exist, the function returns a `Text`
+/// If the file specified by [path] does not exist, the function returns a `text`
 /// widget displaying "Not Found".
 ///
 /// Returns a widget displaying the loaded polylines on the map.
 Future<Widget> _filePolylines(
-  String path, {
+  File file, {
   required PolylineProperties polylineProperties,
   Polyline Function(
           PolylineProperties polylineProperties, Map<String, dynamic>? map)?
       builder,
   MapController? mapController,
   Key? key,
-  bool polylineCulling = false,
+  required Widget Function(int? statusCode)? fallback,
 }) async {
-  final file = File(path);
   var exists = await file.exists();
   if (exists) {
     var readasstring = await file.readAsString();
@@ -64,10 +63,9 @@ Future<Widget> _filePolylines(
       builder: builder,
       mapController: mapController,
       key: key,
-      polylineCulling: polylineCulling,
     );
   } else {
-    return const Text('Not Found');
+    return fallback?.call(null) ?? const Text('Not Found');
   }
 }
 
@@ -97,7 +95,7 @@ Future<Widget> _filePolylines(
 ///     } else if (snapshot.connectionState == ConnectionState.waiting) {
 ///       return const Center(child: CircularProgressIndicator());
 ///     }
-///     return const Text('Error loading polylines');
+///     return const text('Error loading polylines');
 ///   },
 /// )
 /// ```
@@ -114,7 +112,6 @@ Future<Widget> _memoryPolylines(
       builder,
   MapController? mapController,
   Key? key,
-  bool polylineCulling = false,
 }) async {
   File file = File.fromRawPath(list);
   var string = await file.readAsString();
@@ -124,7 +121,6 @@ Future<Widget> _memoryPolylines(
     builder: builder,
     mapController: mapController,
     key: key,
-    polylineCulling: polylineCulling,
   );
 }
 
@@ -154,7 +150,7 @@ Future<Widget> _memoryPolylines(
 ///     } else if (snapshot.connectionState == ConnectionState.waiting) {
 ///       return const Center(child: CircularProgressIndicator());
 ///     }
-///     return const Text('Error loading polylines');
+///     return const text('Error loading polylines');
 ///   },
 /// )
 /// ```
@@ -171,7 +167,6 @@ Future<Widget> _assetPolylines(
       builder,
   MapController? mapController,
   Key? key,
-  bool polylineCulling = false,
 }) async {
   final string = await rootBundle.loadString(path);
   return _string(
@@ -180,7 +175,6 @@ Future<Widget> _assetPolylines(
     builder: builder,
     mapController: mapController,
     key: key,
-    polylineCulling: polylineCulling,
   );
 }
 
@@ -210,7 +204,7 @@ Future<Widget> _assetPolylines(
 ///     } else if (snapshot.connectionState == ConnectionState.waiting) {
 ///       return const Center(child: CircularProgressIndicator());
 ///     }
-///     return const Text('Error loading polylines');
+///     return const text('Error loading polylines');
 ///   },
 /// )
 /// ```
@@ -230,21 +224,24 @@ Future<Widget> _networkPolylines(
           PolylineProperties polylineProperties, Map<String, dynamic>? map)?
       builder,
   MapController? mapController,
-  bool polylineCulling = false,
+  required Widget Function(int? statusCode)? fallback,
 }) async {
-  var method = client == null ? get : client.get;
-  var response = await method(urlString, headers: headers);
+  Future<Response> Function(Uri url, {Map<String, String>? headers}) method =
+      client == null ? get : client.get;
+  Response response = await method(urlString, headers: headers);
   var string = response.body;
-  return statusCodes.contains(response.statusCode)
-      ? _string(
-          checkEsri(string),
-          polylineProperties: polylineProperties,
-          builder: builder,
-          mapController: mapController,
-          key: key,
-          polylineCulling: polylineCulling,
-        )
-      : Text('${response.statusCode}');
+  if (statusCodes.contains(response.statusCode)) {
+    return _string(
+      checkEsri(string),
+      polylineProperties: polylineProperties,
+      builder: builder,
+      mapController: mapController,
+      key: key,
+    );
+  } else {
+    return fallback?.call(response.statusCode) ??
+        Text('${response.statusCode}');
+  }
 }
 
 /// Creates a widget to display polylines from GeoJSON string data on a map.
@@ -278,7 +275,6 @@ Widget _string(
           PolylineProperties polylineProperties, Map<String, dynamic>? map)?
       builder,
   MapController? mapController,
-  required bool polylineCulling,
 }) {
   final geojson = PowerGeoJSONFeatureCollection.fromJson(checkEsri(string));
 
@@ -298,7 +294,6 @@ Widget _string(
   return PolylineLayer(
     polylines: polylines,
     key: key,
-    polylineCulling: polylineCulling,
   );
 }
 
@@ -334,11 +329,11 @@ class PowerGeoJSONPolylines {
     // layer
     Key? key,
     PolylineProperties polylineProperties = const PolylineProperties(),
+    Widget Function(int? statusCode)? fallback,
     Polyline Function(
             PolylineProperties polylineProperties, Map<String, dynamic>? map)?
         builder,
     MapController? mapController,
-    bool polylineCulling = false,
   }) {
     var uriString = url.toUri();
     return EnhancedFutureBuilder(
@@ -349,9 +344,9 @@ class PowerGeoJSONPolylines {
         statusCodes: statusCodes,
         polylineProperties: polylineProperties,
         builder: builder,
+        fallback: fallback,
         mapController: mapController,
         key: key,
-        polylineCulling: polylineCulling,
       ),
       rememberFutureResult: true,
       whenDone: (Widget snapshotData) => snapshotData,
@@ -390,7 +385,6 @@ class PowerGeoJSONPolylines {
         builder,
     MapController? mapController,
     Key? key,
-    bool polylineCulling = false,
   }) {
     return EnhancedFutureBuilder(
       future: _assetPolylines(
@@ -399,7 +393,6 @@ class PowerGeoJSONPolylines {
         builder: builder,
         mapController: mapController,
         key: key,
-        polylineCulling: polylineCulling,
       ),
       rememberFutureResult: true,
       whenDone: (Widget snapshotData) => snapshotData,
@@ -408,22 +401,22 @@ class PowerGeoJSONPolylines {
   }
 
   static Widget file(
-    String path, {
+    File file, {
     PolylineProperties polylineProperties = const PolylineProperties(),
     Polyline Function(
             PolylineProperties polylineProperties, Map<String, dynamic>? map)?
         builder,
     MapController? mapController,
+    Widget Function(int? statusCode)? fallback,
     Key? key,
-    bool polylineCulling = false,
   }) {
     return EnhancedFutureBuilder(
       future: _filePolylines(
-        path,
+        file,
         polylineProperties: polylineProperties,
         builder: builder,
+        fallback: fallback,
         mapController: mapController,
-        polylineCulling: polylineCulling,
         key: key,
       ),
       rememberFutureResult: true,
@@ -463,7 +456,6 @@ class PowerGeoJSONPolylines {
         builder,
     MapController? mapController,
     Key? key,
-    bool polylineCulling = false,
   }) {
     return EnhancedFutureBuilder(
       future: _memoryPolylines(
@@ -472,7 +464,6 @@ class PowerGeoJSONPolylines {
         builder: builder,
         mapController: mapController,
         key: key,
-        polylineCulling: polylineCulling,
       ),
       rememberFutureResult: true,
       whenDone: (Widget snapshotData) => snapshotData,
@@ -511,14 +502,12 @@ class PowerGeoJSONPolylines {
         builder,
     MapController? mapController,
     Key? key,
-    bool polylineCulling = false,
   }) {
     return _string(
       data,
       polylineProperties: polylineProperties,
       builder: builder,
       key: key,
-      polylineCulling: polylineCulling,
       mapController: mapController,
     );
   }

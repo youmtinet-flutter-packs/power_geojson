@@ -18,7 +18,7 @@ const List<String> _esriFields = [
 
 /// Loads polygons from a file and returns a widget for map display.
 ///
-/// The [path] parameter specifies the file path to the polygon data file.
+/// The [file] parameter specifies the file path to the polygon data file.
 ///
 /// Example:
 ///
@@ -31,7 +31,7 @@ const List<String> _esriFields = [
 /// )
 /// ```
 Future<Widget> _filePolygons(
-  String path, {
+  File file, {
   Polygon Function(
     List<List<List<double>>> coordinates,
     Map<String, dynamic>? map,
@@ -40,8 +40,8 @@ Future<Widget> _filePolygons(
   MapController? mapController,
   Key? key,
   bool polygonCulling = false,
+  required Widget Function(int? statusCode)? fallback,
 }) async {
-  final file = File(path);
   var exists = await file.exists();
   if (exists) {
     var readasstring = await file.readAsString();
@@ -54,7 +54,7 @@ Future<Widget> _filePolygons(
       key: key,
     );
   } else {
-    return const Text('Not Found');
+    return fallback?.call(null) ?? const Text('Not Found');
   }
 }
 
@@ -127,7 +127,7 @@ Future<Widget> _assetPolygons(
   Key? key,
   MapController? mapController,
 }) async {
-  final string = await rootBundle.loadString(path);
+  final String string = await rootBundle.loadString(path);
   return _string(
     checkEsri(string),
     builder: builder,
@@ -164,20 +164,24 @@ Future<Widget> _networkPolygons(
   bool polygonCulling = false,
   Key? key,
   MapController? mapController,
+  required Widget Function(int? statusCode)? fallback,
 }) async {
   var method = client == null ? get : client.get;
   var response = await method(urlString, headers: headers);
   var string = response.body;
-  return statusCodes.contains(response.statusCode)
-      ? _string(
-          checkEsri(string),
-          builder: builder,
-          polygonProperties: polygonProperties,
-          key: key,
-          polygonCulling: polygonCulling,
-          mapController: mapController,
-        )
-      : Text('${response.statusCode}');
+  if (statusCodes.contains(response.statusCode)) {
+    return _string(
+      checkEsri(string),
+      builder: builder,
+      polygonProperties: polygonProperties,
+      key: key,
+      polygonCulling: polygonCulling,
+      mapController: mapController,
+    );
+  } else {
+    return fallback?.call(response.statusCode) ??
+        Text('${response.statusCode}');
+  }
 }
 
 /// Parses the polygon data provided as a string and returns a widget for map display.
@@ -303,6 +307,7 @@ class PowerGeoJSONPolygons {
         builder,
     PolygonProperties? polygonProperties,
     MapController? mapController,
+    Widget Function(int? statusCode)? fallback,
   }) {
     assert((builder == null && polygonProperties != null) ||
         (polygonProperties == null && builder != null));
@@ -318,6 +323,7 @@ class PowerGeoJSONPolygons {
         key: key,
         polygonCulling: polygonCulling,
         mapController: mapController,
+        fallback: fallback,
       ),
       rememberFutureResult: true,
       whenDone: (Widget snapshotData) => snapshotData,
@@ -383,7 +389,7 @@ class PowerGeoJSONPolygons {
   /// )
   /// ```
   static Widget file(
-    String path, {
+    File path, {
     // layer
     Key? key,
     bool polygonCulling = false,
@@ -392,6 +398,7 @@ class PowerGeoJSONPolygons {
             List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
         builder,
     MapController? mapController,
+    Widget Function(int? statusCode)? fallback,
   }) {
     assert((builder == null && polygonProperties != null) ||
         (polygonProperties == null && builder != null));
@@ -401,6 +408,7 @@ class PowerGeoJSONPolygons {
         builder: builder,
         polygonProperties: polygonProperties,
         key: key,
+        fallback: fallback,
         polygonCulling: polygonCulling,
         mapController: mapController,
       ),

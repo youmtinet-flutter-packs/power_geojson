@@ -16,16 +16,15 @@ class NetworkGeoJSONPolygon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONPolygons.network(
-      "$url/others/network_polygons.json",
+      "$url/network/polygons.geojson",
       polygonProperties: const PolygonProperties(
         layerProperties: {
           LayerPolygonIndexes.fillColor: 'COLOR',
-          LayerPolygonIndexes.label: 'ECO_NAME',
+          LayerPolygonIndexes.label: 'placename',
         },
-        isDotted: false,
         rotateLabel: true,
         borderStokeWidth: 0.02,
-        fillColor: Color(0xFF17CD11),
+        fillColor: Color(0xFF541b82),
         labelStyle: TextStyle(
           fontStyle: FontStyle.italic,
           color: Color(0xFF830202),
@@ -35,69 +34,19 @@ class NetworkGeoJSONPolygon extends StatelessWidget {
         ),
         labeled: true,
       ),
-      mapController: _mapController,
-    );
-  }
-}
-
-class NetworkGeoJSONMultiPolygon extends StatelessWidget {
-  const NetworkGeoJSONMultiPolygon({
-    Key? key,
-    MapController? mapController,
-  })  : _mapController = mapController,
-        super(key: key);
-
-  final MapController? _mapController;
-
-  @override
-  Widget build(BuildContext context) {
-    return PowerGeoJSONPolygons.network(
-      "$url/others/network_polygonsmultiples.json",
-      polygonProperties: const PolygonProperties(
-        layerProperties: {
-          LayerPolygonIndexes.fillColor: 'COLOR',
-        },
-        isDotted: false,
-        rotateLabel: true,
-        label: 'MP',
-        borderStokeWidth: 0.02,
-        fillColor: Color(0xFFA33A10),
-        labelStyle: TextStyle(
-          fontStyle: FontStyle.italic,
-          color: Color(0xFF830202),
-          shadows: [
-            Shadow(blurRadius: 10, color: Colors.white),
+      fallback: (statusCode) {
+        return const MarkerLayer(
+          markers: [
+            Marker(
+              point: LatLng(33.926447747065936, -2.3228343908943998),
+              width: 160,
+              height: 60,
+              child: Text(
+                'Network Polygons Not Found',
+                style: TextStyle(fontSize: 8, color: Colors.blue),
+              ),
+            ),
           ],
-        ),
-        labeled: true,
-      ),
-      mapController: _mapController,
-    );
-  }
-}
-
-class NetworkGeoJSONMultiPolygon1 extends StatelessWidget {
-  const NetworkGeoJSONMultiPolygon1({
-    Key? key,
-    MapController? mapController,
-  })  : _mapController = mapController,
-        super(key: key);
-
-  final MapController? _mapController;
-
-  @override
-  Widget build(BuildContext context) {
-    return PowerGeoJSONPolygons.network(
-      "$url/geometries/multipolygon.json",
-      builder: (coordinates, map) {
-        TextFormField();
-        return Polygon(
-          points: coordinates.first.map((e) => LatLng(e[1], e[0])).toList(),
-          holePointsList: coordinates
-              .map((f) => f.map((e) => LatLng(e[1], e[0])).toList())
-              .toList(),
-          color: Colors.purple,
-          isFilled: true,
         );
       },
       mapController: _mapController,

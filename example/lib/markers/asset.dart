@@ -1,47 +1,84 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:power_geojson/power_geojson.dart';
+import 'package:power_geojson_example/lib.dart';
 
 class AssetGeoJSONMarkerPoints extends StatelessWidget {
-  const AssetGeoJSONMarkerPoints({Key? key, this.mapController})
+  const AssetGeoJSONMarkerPoints(
+      {Key? key, required this.popupController, this.mapController})
       : super(key: key);
   final MapController? mapController;
+  final PopupController popupController;
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONMarkers.asset(
-      'assets/geojsons/assets_points.geojson',
-      markerProperties: const MarkerProperties(),
-      builder: (context, markerProps, props) {
-        return Transform.rotate(
-          angle: pi,
-          child: SvgPicture.asset(
-            "assets/icons/position.svg",
-            color: const Color(0xFF72077C),
-          ),
-        );
-      },
+      'assets/points.geojson',
+      markerProperties: const MarkerProperties(width: 45, height: 45),
+      builder: (context, markerProperties, map) =>
+          FittedBox(child: _markerBuilder()),
+      powerClusterOptions: PowerMarkerClusterOptions(
+        popupOptions: PowerPopupOptions(
+          popupController: popupController,
+          popupBuilder: (context, PowerMarker powerMarker) {
+            Map<String, Object?>? properties = powerMarker.properties;
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(properties == null
+                    ? ''
+                    : AssetMarkerProperties.fromJson(properties).name),
+              ),
+            );
+          },
+        ),
+        builder: (context, markers) => Badge.count(
+          count: markers.length,
+          child: _markerBuilder(),
+        ),
+      ),
+      /* builder: (context, MarkerProperties markerProps, props) {
+        var prop = props?['Name'];
+        return _stackMarkerBuilder(prop);
+      }, */
     );
   }
-}
 
-class AssetGeoJSONMarkerMultiPoints extends StatelessWidget {
-  const AssetGeoJSONMarkerMultiPoints({Key? key, this.mapController})
-      : super(key: key);
-  final MapController? mapController;
-  @override
-  Widget build(BuildContext context) {
-    return PowerGeoJSONMarkers.asset(
-      'assets/geojsons/assets_pointsmultiples.geojson',
-      markerProperties: const MarkerProperties(),
-      /* builder: (context, markerProps, props) {
-        return SvgPicture.asset(
-          "assets/icons/position.svg",
-          color: const Color(0xff73EF28),
-        );
-      }, */
+  Stack stackMarkerBuilder(dynamic prop) {
+    return Stack(
+      children: [
+        _markerBuilder(),
+        if (prop.runtimeType == String)
+          Text(
+            prop,
+            style: const TextStyle(
+              color: Colors.white,
+              shadows: [
+                Shadow(color: Colors.black, blurRadius: 5),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+/* 
+  Transform _markerBuilder() {
+    return Transform.rotate(
+      angle: pi,
+      child: SvgPicture.asset(
+        "assets/icons/position.svg",
+        theme: const SvgTheme(
+          currentColor: Color(0xFF72077C),
+        ),
+      ),
+    );
+  } */
+
+  Transform _markerBuilder() {
+    return Transform.rotate(
+      angle: pi,
+      child: PinCentered(color: Color(0xFF72077C)),
     );
   }
 }

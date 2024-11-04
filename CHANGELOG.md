@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.0.8+14] - 2024-02-29
+
+- Upgrade flutter_map: ^7
+- add fallback widget
+- add marker_popup and clustering
+- add real_world data samples
+- upgrade targetSdk=34, flutter 3.24.4
+- Bug fixing
+
 ## [1.0.7+13] - 2024-02-29
 
 - Add Esri Json Support

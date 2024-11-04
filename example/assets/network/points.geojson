@@ -1,0 +1,4 @@
+{
+  "type" : "FeatureCollection",
+  "features" : [{"type":"Feature","id":1,"geometry":{"type":"Point","coordinates":[-6.8359194546906838,34.016265989609686]},"properties":{"OBJECTID":1,"PlaceName":"Gare Rabat Ville"}},{"type":"Feature","id":2,"geometry":{"type":"Point","coordinates":[-6.8670217780603782,33.991039067566724]},"properties":{"OBJECTID":2,"PlaceName":"Alkamra"}},{"type":"Feature","id":3,"geometry":{"type":"Point","coordinates":[-6.8358130995509283,34.032071882654733]},"properties":{"OBJECTID":3,"PlaceName":"Oudayah"}}]
+}
