@@ -4,8 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart'
-    show PopupController, PopupScope;
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart' show PopupController, PopupScope;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'dart:async';
@@ -113,9 +112,7 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
               onMapReady: () async => await _createFiles(),
             ),
             children: [
-              TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  maxZoom: 19),
+              TileLayer(urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxZoom: 19),
               const AssetGeoJSONZones(),
               //////////////// Polygons
               const AssetGeoJSONPolygon(),
@@ -170,12 +167,9 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
 }
 
 Future<void> _createFiles() async {
-  final String assetsPoints /**********/ = await rootBundle
-      .loadString('assets/file/points.geojson' /**************/);
-  final String assetsLines /***********/ = await rootBundle
-      .loadString('assets/file/lines.geojson' /***************/);
-  final String assetsPolygons /********/ = await rootBundle
-      .loadString('assets/file/polygons.geojson' /************/);
+  final String assetsPoints /**********/ = await rootBundle.loadString('assets/file/points.geojson' /**************/);
+  final String assetsLines /***********/ = await rootBundle.loadString('assets/file/lines.geojson' /***************/);
+  final String assetsPolygons /********/ = await rootBundle.loadString('assets/file/polygons.geojson' /************/);
   await _createFile('files_points', /**********/ assetsPoints);
   await _createFile('files_lines', /***********/ assetsLines);
   await _createFile('files_polygons', /********/ assetsPolygons);
@@ -183,8 +177,7 @@ Future<void> _createFiles() async {
 
 Future<File> _createFile(String filename, String data) async {
   List<Directory>? list = await getExternalDir();
-  String directory =
-      ((list == null || list.isEmpty) ? Directory('/') : list[0]).path;
+  String directory = ((list == null || list.isEmpty) ? Directory('/') : list[0]).path;
   String path = "$directory/$filename";
   Console.log(path);
   File file = File(path);
@@ -240,6 +233,7 @@ class PinCentered extends StatelessWidget {
         SizedBox(width: parent, height: parent),
         // Positioned(left: 0, top: (parentH - gapH) / 2, child: Container(height: gapH, width: parentW, color: Colors.white)),
         // Positioned(left: (parentW - gapW) / 2, top: 0, child: Container(height: parentH, width: gapW, color: Colors.white)),
+
         Positioned(
           left: (parent - iconSize) / 2,
           top: parent / 2 - iconSize,
@@ -248,6 +242,11 @@ class PinCentered extends StatelessWidget {
             size: iconSize,
             color: color,
           ),
+        ),
+        Container(
+          width: 4,
+          height: 4,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
       ],
     );
