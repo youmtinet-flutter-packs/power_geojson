@@ -16,8 +16,7 @@ class FileGeoJSONMarkers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONMarkers.file(
-      File(
-          "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points"),
+      File("/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points"),
       /* builder: (context, markerProps, props) {
         return Transform.scale(
           scale: 1.1,
@@ -27,6 +26,21 @@ class FileGeoJSONMarkers extends StatelessWidget {
           ),
         );
       }, */
+
+      powerClusterOptions: PowerMarkerClusterOptions(
+        builder: (context, markers) {
+          return Badge.count(
+            count: markers.length,
+            backgroundColor: Colors.green,
+            child: PowerGeoJSONMarkers.defaultMarkerBuilder(
+              context,
+              MarkerProperties(),
+              markers.first.properties,
+              color: Colors.green,
+            ),
+          );
+        },
+      ),
       markerProperties: const MarkerProperties(),
       mapController: _mapController,
     );

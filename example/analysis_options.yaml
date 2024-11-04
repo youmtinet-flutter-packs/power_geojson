@@ -14,3 +14,4 @@ linter:
   rules:
     constant_identifier_names: false
     prefer_const_constructors: false
+    prefer_const_constructors_in_immutables: false
