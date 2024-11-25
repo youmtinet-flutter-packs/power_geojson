@@ -17,7 +17,7 @@ class NetworkGeoJSONMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONMarkers.network(
-      "$url/network/points.geojson",
+      "$url/points.geojson",
       markerProperties: const MarkerProperties(),
       builder: (context, markerProperties, mapProperties) {
         return SvgPicture.asset(

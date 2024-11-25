@@ -24,6 +24,9 @@ dependencies:
   proj4dart: ^2.1.0
   wakelock_plus: ^1.2.8
   flutter_map_marker_cluster: ^1.4.0
+  dio: ^5.7.0
+  image_picker: ^1.1.2
+  mime: ^2.0.0
 
 
 dev_dependencies:

@@ -16,7 +16,7 @@ class NetworkGeoJSONPolygon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONPolygons.network(
-      "$url/network/polygons.geojson",
+      "$url/polygons.geojson",
       polygonProperties: const PolygonProperties(
         layerProperties: {
           LayerPolygonIndexes.fillColor: 'COLOR',

@@ -25,24 +25,27 @@ class FileGeoJSONMarkers extends StatelessWidget {
             color: HexColor.fromHex(props['color'], const Color(0xFFFFF238)),
           ),
         );
-      }, */
-
-      powerClusterOptions: PowerMarkerClusterOptions(
-        builder: (context, markers) {
-          return Badge.count(
-            count: markers.length,
-            backgroundColor: Colors.green,
-            child: PowerGeoJSONMarkers.defaultMarkerBuilder(
-              context,
-              MarkerProperties(),
-              markers.first.properties,
-              color: Colors.green,
-            ),
-          );
-        },
-      ),
+      },*/
+      //   powerClusterOptions: clusterOptions(),
       markerProperties: const MarkerProperties(),
       mapController: _mapController,
+    );
+  }
+
+  PowerMarkerClusterOptions clusterOptions() {
+    return PowerMarkerClusterOptions(
+      builder: (context, markers) {
+        return Badge.count(
+          count: markers.length,
+          backgroundColor: Colors.green,
+          child: PowerGeoJSONMarkers.defaultMarkerBuilder(
+            context,
+            MarkerProperties(),
+            markers.first.properties,
+            color: Colors.green,
+          ),
+        );
+      },
     );
   }
 }

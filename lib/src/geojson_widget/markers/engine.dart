@@ -312,6 +312,7 @@ Widget _string(
 
   List<List<double>?> bbox = geojson.geoJSONPoints.map((e) => e.bbox).toList();
   zoomTo(bbox, mapController);
+
   if (powerClusterOptions != null) {
     return MarkerClusterLayerWidget(
       options: powerClusterOptions.toClusterOptions(powerClusterOptions, markers),

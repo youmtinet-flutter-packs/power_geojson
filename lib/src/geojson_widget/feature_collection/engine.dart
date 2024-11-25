@@ -30,8 +30,7 @@ Future<String> _defaultFileLoadBuilder(String path) async {
 /// - [headers]: Optional HTTP headers to include in the request.
 ///
 /// Returns a [Future] that completes with the response body as a string.
-Future<String> _defaultNetworkLoader(
-    Client? client, Uri uri, Map<String, String>? headers) async {
+Future<String> _defaultNetworkLoader(Client? client, Uri uri, Map<String, String>? headers) async {
   var method = client == null ? get : client.get;
   var response = await method(uri, headers: headers);
   var string = response.body;
@@ -57,10 +56,7 @@ Future<String> _defaultNetworkLoader(
 Future<Widget> _fileFeatureCollections(
   String path, {
   required FeatureCollectionProperties featureCollectionLayerProperties,
-  required Widget Function(
-          FeatureCollectionProperties featureCollectionProperties,
-          Map<String, dynamic>? map)
-      builder,
+  required Widget Function(FeatureCollectionProperties featureCollectionProperties, Map<String, dynamic>? map) builder,
   required Future<String> Function(String filePath) fileLoadBuilder,
   MapController? mapController,
   bool polygonCulling = false,
@@ -97,10 +93,7 @@ Future<Widget> _fileFeatureCollections(
 Future<Widget> _memoryFeatureCollections(
   Uint8List list, {
   required FeatureCollectionProperties featureCollectionLayerProperties,
-  required Widget Function(
-          FeatureCollectionProperties featureCollectionProperties,
-          Map<String, dynamic>? map)
-      builder,
+  required Widget Function(FeatureCollectionProperties featureCollectionProperties, Map<String, dynamic>? map) builder,
   MapController? mapController,
   bool polygonCulling = false,
   Key? key,
@@ -139,10 +132,7 @@ Future<Widget> _assetFeatureCollections(
   required FeatureCollectionProperties featureCollectionProperties,
   bool polygonCulling = false,
   MapController? mapController,
-  required Widget Function(
-          FeatureCollectionProperties featureCollectionProperties,
-          Map<String, dynamic>? map)
-      builder,
+  required Widget Function(FeatureCollectionProperties featureCollectionProperties, Map<String, dynamic>? map) builder,
   Key? key,
   required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
@@ -183,13 +173,8 @@ Future<Widget> _networkFeatureCollections(
   Client? client,
   Map<String, String>? headers,
   bool polygonCulling = false,
-  required Widget Function(
-          FeatureCollectionProperties featureCollectionProperties,
-          Map<String, dynamic>? map)
-      builder,
-  required Future<String> Function(
-          Client? client, Uri uri, Map<String, String>? map)
-      networkLoadBuilder,
+  required Widget Function(FeatureCollectionProperties featureCollectionProperties, Map<String, dynamic>? map) builder,
+  required Future<String> Function(Client? client, Uri uri, Map<String, String>? map) networkLoadBuilder,
   MapController? mapController,
   required PowerMarkerClusterOptions? powerClusterOptions,
 }) async {
@@ -223,18 +208,14 @@ Future<Widget> _networkFeatureCollections(
 Widget _string(
   String json, {
   Key? key,
-  required Widget Function(
-          FeatureCollectionProperties featureCollectionProperties,
-          Map<String, Object?>? map)
-      builder,
+  required Widget Function(FeatureCollectionProperties featureCollectionProperties, Map<String, Object?>? map) builder,
   required FeatureCollectionProperties featureCollectionPropertie,
   bool polygonCulling = false,
   MapController? mapController,
   required PowerMarkerClusterOptions? powerClusterOptions,
 }) {
-  PowerGeoJSONFeatureCollection parseGeoJSON =
-      PowerGeoJSONFeatureCollection.fromJson(checkEsri(json));
-  List<PowerMarker> powerMarkers = parseGeoJSON.geoJSONPoints
+  PowerGeoJSONFeatureCollection parseGeoJSON = PowerGeoJSONFeatureCollection.fromJson(checkEsri(json));
+  List<PowerMarker> markers = parseGeoJSON.geoJSONPoints
       .map(
         (e) => e.geometry.coordinates.toPowerMarker(
           markerProperties: featureCollectionPropertie.markerProperties,
@@ -252,22 +233,21 @@ Widget _string(
       if (powerClusterOptions != null)
         MarkerClusterLayerWidget(
           options: powerClusterOptions.toClusterOptions(
-              powerClusterOptions, powerMarkers),
+            powerClusterOptions,
+            markers,
+          ),
         )
       else
         MarkerLayer(
           rotate: featureCollectionPropertie.markerProperties.rotate ?? false,
-          alignment:
-              featureCollectionPropertie.markerProperties.rotateAlignment ??
-                  Alignment.center,
-          markers: powerMarkers,
+          alignment: featureCollectionPropertie.markerProperties.rotateAlignment ?? Alignment.center,
+          markers: markers,
         ),
       PolylineLayer(
         polylines: parseGeoJSON.geoJSONLineStrings
             .map(
               (e) => e.geometry.coordinates.toPolyline(
-                polylineProperties:
-                    featureCollectionPropertie.polylineProperties,
+                polylineProperties: featureCollectionPropertie.polylineProperties,
               ),
             )
             .toList(),
@@ -314,8 +294,7 @@ class PowerGeoJSONFeatureCollections {
     required FeatureCollectionProperties featureCollectionProperties,
     bool polygonCulling = false,
     MapController? mapController,
-    Future<String> Function(Client? client, Uri uri, Map<String, String>? map)?
-        networkLoadBuilder,
+    Future<String> Function(Client? client, Uri uri, Map<String, String>? map)? networkLoadBuilder,
     Key? key,
     PowerMarkerClusterOptions? powerClusterOptions,
   }) {
@@ -351,10 +330,7 @@ class PowerGeoJSONFeatureCollections {
     required FeatureCollectionProperties featureCollectionProperties,
     bool polygonCulling = false,
     MapController? mapController,
-    required Widget Function(
-            FeatureCollectionProperties featureCollectionProperties,
-            Map<String, dynamic>? map)
-        builder,
+    required Widget Function(FeatureCollectionProperties featureCollectionProperties, Map<String, dynamic>? map) builder,
     Key? key,
     PowerMarkerClusterOptions? powerClusterOptions,
   }) {
@@ -389,10 +365,7 @@ class PowerGeoJSONFeatureCollections {
     MapController? mapController,
     Key? key,
     Future<String> Function(String)? fileLoadBuilder,
-    required Widget Function(
-            FeatureCollectionProperties featureCollectionProperties,
-            Map<String, dynamic>? map)
-        builder,
+    required Widget Function(FeatureCollectionProperties featureCollectionProperties, Map<String, dynamic>? map) builder,
     PowerMarkerClusterOptions? powerClusterOptions,
   }) {
     return _fileFeatureCollections(
@@ -461,10 +434,7 @@ class PowerGeoJSONFeatureCollections {
     MapController? mapController,
     Key? key,
     required PowerMarkerClusterOptions? powerClusterOptions,
-    required Widget Function(
-            FeatureCollectionProperties featureCollectionProperties,
-            Map<String, dynamic>? properties)
-        builder,
+    required Widget Function(FeatureCollectionProperties featureCollectionProperties, Map<String, dynamic>? properties) builder,
   }) {
     return _string(
       data,

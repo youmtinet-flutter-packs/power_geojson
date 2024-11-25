@@ -60,17 +60,15 @@ class PowerPopupOptions {
     MarkerTapBehavior? markerTapBehavior,
     this.buildPopupOnHover = false,
     this.timeToShowPopupOnHover = 300,
-  }) : markerTapBehavior =
-            markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest();
+  }) : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest();
 }
 
 // In a separate file so it can be exported individually in extension_api.dart
-typedef PowerPopupBuilder = Widget Function(
-    BuildContext context, PowerMarker powerMarker);
-typedef PowerClusterWidgetBuilder = Widget Function(
-    BuildContext context, List<PowerMarker> markers);
+typedef PowerPopupBuilder = Widget Function(BuildContext context, PowerMarker powerMarker);
+typedef PowerClusterWidgetBuilder = Widget Function(BuildContext context, List<PowerMarker> markers);
 
 class PowerMarkerClusterOptions {
+  //
   /// Cluster builder
   final PowerClusterWidgetBuilder builder;
 
@@ -192,12 +190,9 @@ class PowerMarkerClusterOptions {
     this.markerChildBehavior = false,
   });
 
-  MarkerClusterLayerOptions toClusterOptions(
-      PowerMarkerClusterOptions powerClusterOptions,
-      List<PowerMarker> markers) {
+  MarkerClusterLayerOptions toClusterOptions(PowerMarkerClusterOptions powerClusterOptions, List<PowerMarker> markers) {
     return MarkerClusterLayerOptions(
-      builder: (context, markers) =>
-          builder(context, markers.whereType<PowerMarker>().toList()),
+      builder: (context, markers) => builder(context, markers.whereType<PowerMarker>().toList()),
       rotate: rotate,
       markers: markers,
       size: size,
@@ -233,29 +228,22 @@ class PowerMarkerClusterOptions {
         popupController: popupOptions?.popupController,
         popupSnap: popupOptions?.popupSnap ?? PopupSnap.markerTop,
         timeToShowPopupOnHover: popupOptions?.timeToShowPopupOnHover ?? 300,
-        popupBuilder: (context, marker) =>
-            _markerBuilder(powerClusterOptions, marker, context),
+        popupBuilder: (_, marker) => _markerBuilder(powerClusterOptions, marker),
       ),
       markerChildBehavior: markerChildBehavior,
     );
   }
 
-  PopupMarkerLayerOptions toPopupOptions(
-      PowerMarkerClusterOptions powerClusterOptions,
-      List<PowerMarker> markers) {
+  PopupMarkerLayerOptions toPopupOptions(PowerMarkerClusterOptions powerClusterOptions, List<PowerMarker> markers) {
     return PopupMarkerLayerOptions(
       markers: markers,
       markerTapBehavior: popupOptions?.markerTapBehavior,
       popupController: popupOptions?.popupController,
       selectedMarkerBuilder: (context, marker) {
-        return SizedBox(
-            width: 45,
-            height: 45,
-            child: _markerBuilder(powerClusterOptions, marker, context));
+        return SizedBox(width: 45, height: 45, child: _markerBuilder /**/ (powerClusterOptions, marker));
       },
       popupDisplayOptions: PopupDisplayOptions(
-        builder: (context, marker) =>
-            _markerBuilder(powerClusterOptions, marker, context),
+        builder: (context, marker) => _markerBuilder /**/ (powerClusterOptions, marker),
         animation: popupOptions?.popupAnimation,
         snap: popupOptions?.popupSnap ?? PopupSnap.markerTop,
       ),
@@ -265,14 +253,12 @@ class PowerMarkerClusterOptions {
     );
   }
 
-  Widget _markerBuilder(PowerMarkerClusterOptions powerClusterOptions,
-      Marker marker, BuildContext context) {
+  Widget _markerBuilder(PowerMarkerClusterOptions powerClusterOptions, Marker marker) {
     PowerPopupOptions? popupOptions = powerClusterOptions.popupOptions;
     if ((marker is PowerMarker && popupOptions != null)) {
-      return popupOptions.popupBuilder(
-        context,
-        marker,
-      );
+      return Builder(builder: (context) {
+        return popupOptions.popupBuilder(context, marker);
+      });
     } else {
       return Container(
         width: 50,

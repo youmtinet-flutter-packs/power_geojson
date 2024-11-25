@@ -5,7 +5,11 @@ import 'package:power_geojson/power_geojson.dart';
 import 'package:power_geojson_example/lib.dart';
 
 class AssetGeoJSONMarkerPoints extends StatelessWidget {
-  const AssetGeoJSONMarkerPoints({Key? key, required this.popupController, this.mapController}) : super(key: key);
+  const AssetGeoJSONMarkerPoints({
+    Key? key,
+    required this.popupController,
+    this.mapController,
+  }) : super(key: key);
   final MapController? mapController;
   final PopupController popupController;
   @override
@@ -14,29 +18,34 @@ class AssetGeoJSONMarkerPoints extends StatelessWidget {
       'assets/points.geojson',
       markerProperties: const MarkerProperties(width: 45, height: 45),
       builder: (context, markerProperties, map) => FittedBox(child: _markerBuilder()),
-      powerClusterOptions: PowerMarkerClusterOptions(
-        popupOptions: PowerPopupOptions(
-          popupController: popupController,
-          popupBuilder: (context, PowerMarker powerMarker) {
-            Map<String, Object?>? properties = powerMarker.properties;
-            return Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(properties == null ? '' : AssetMarkerProperties.fromJson(properties).name),
-              ),
-            );
-          },
-        ),
-        spiderfyCluster: true,
-        builder: (context, markers) => Badge.count(
-          count: markers.length,
-          child: _markerBuilder(),
-        ),
-      ),
+      mapController: mapController,
+      //   powerClusterOptions: clusterOptions(),
       /* builder: (context, MarkerProperties markerProps, props) {
         var prop = props?['Name'];
         return _stackMarkerBuilder(prop);
       }, */
+    );
+  }
+
+  PowerMarkerClusterOptions clusterOptions() {
+    return PowerMarkerClusterOptions(
+      popupOptions: PowerPopupOptions(
+        popupController: popupController,
+        popupBuilder: (context, PowerMarker powerMarker) {
+          Map<String, Object?>? properties = powerMarker.properties;
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(properties == null ? '' : AssetMarkerProperties.fromJson(properties).name),
+            ),
+          );
+        },
+      ),
+      spiderfyCluster: true,
+      builder: (context, markers) => Badge.count(
+        count: markers.length,
+        child: _markerBuilder(),
+      ),
     );
   }
 

@@ -16,7 +16,7 @@ class NetworkGeoJSONLines extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONPolylines.network(
-      "$url/network/lines.geojson",
+      "$url/lines.geojson",
       polylineProperties: const PolylineProperties(
         /* layerProperties: {
           LayerPolylineIndexes.borderColor: 'COLOR',

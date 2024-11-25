@@ -16,8 +16,7 @@ class FileGeoJSONPolygon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONPolygons.file(
-      File(
-          "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_polygons"),
+      File("/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_polygons"),
       polygonProperties: const PolygonProperties(
         layerProperties: {
           LayerPolygonIndexes.label: 'Name',

@@ -1,4 +1,3 @@
-import 'package:console_tools/console_tools.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart' show PopupController, PopupScope;
@@ -46,6 +45,8 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
   LatLng latLng = LatLng(34.92849168609999, -2.3225879568537056);
   final MapController _mapController = MapController();
   final PopupController _popupController = PopupController();
+
+  final List<Marker> _arcgisMarkers = [];
   @override
   void initState() {
     super.initState();
@@ -53,8 +54,6 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
 
   @override
   Widget build(BuildContext context) {
-    // double distanceMETERS = 10;
-    // var distanceDMS = dmFromMeters(distanceMETERS);
     return Scaffold(
       body: _map(),
     );
@@ -78,11 +77,8 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
               initialCenter: center,
               initialZoom: 11,
               interactionOptions: InteractionOptions(flags: interactiveFlags),
-              onLongPress: (tapPosition, point) {
-                Console.log('onLongPress $point', color: ConsoleColors.citron);
-              },
               onTap: (tapPosition, point) {
-                setState(() {});
+                _popupController.hideAllPopups();
               },
               onMapEvent: (mapEvent) async {},
               onMapReady: () async => await createFiles(),
@@ -102,11 +98,12 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
               NetworkGeoJSONLines(),
               //////////////// Points
               AssetGeoJSONMarkerPoints(popupController: _popupController),
-              FileGeoJSONMarkers(mapController: _mapController),
+              FileGeoJSONMarkers(),
               StringGeoJSONPoints(),
               NetworkGeoJSONMarker(),
-
+              // /////// /// ///// ///
               CircleOfMap(latLng: latLng),
+              MarkerLayer(markers: _arcgisMarkers),
               /* ClustersMarkers(), */
             ],
           ),
