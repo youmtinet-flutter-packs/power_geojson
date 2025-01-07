@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.9+15] - 2025-01-07
+
+- unplugin android/iOS
+
 ## [1.0.8+14] - 2024-02-29
 
 - Upgrade flutter_map: ^7
