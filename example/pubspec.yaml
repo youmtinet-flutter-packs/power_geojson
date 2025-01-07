@@ -4,41 +4,39 @@ description: Demonstrates how to use the power_geojson plugin.
 publish_to: "none"
 
 environment:
-  sdk: ^3.5.4
+    sdk: ^3.5.4
 
 dependencies:
-  flutter:
-    sdk: flutter
-  power_geojson:
-    path: ../
+    flutter:
+        sdk: flutter
+    power_geojson:
+        path: ../
 
-  collection: ^1.18.0
-  console_tools: ^1.0.1
-  cupertino_icons: ^1.0.8
-  enhanced_future_builder: ^2.0.0
-  flutter_map: ^7.0.2
-  flutter_svg: ^2.0.11
-  get: ^4.6.6
-  http: ^1.2.2
-  latlong2: ^0.9.1
-  proj4dart: ^2.1.0
-  wakelock_plus: ^1.2.8
-  flutter_map_marker_cluster: ^1.4.0
-  dio: ^5.7.0
-  image_picker: ^1.1.2
-  mime: ^2.0.0
-
+    collection: ^1.18.0
+    console_tools: ^1.0.1
+    cupertino_icons: ^1.0.8
+    enhanced_future_builder: ^2.0.0
+    flutter_map: ^7.0.2
+    flutter_svg: ^2.0.11
+    get: ^4.6.6
+    http: ^1.2.2
+    latlong2: ^0.9.1
+    proj4dart: ^2.1.0
+    wakelock_plus: ^1.2.8
+    dio: ^5.7.0
+    image_picker: ^1.1.2
+    mime: ^2.0.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+    flutter_test:
+        sdk: flutter
 
-  flutter_lints: ^2.0.0
+    flutter_lints: ^2.0.0
 
 flutter:
-  uses-material-design: true
+    uses-material-design: true
 
-  assets:
-    - assets/
-    - assets/file/
-    - assets/icons/
+    assets:
+        - assets/
+        - assets/file/
+        - assets/icons/

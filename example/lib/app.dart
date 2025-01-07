@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart' show PopupController, PopupScope;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:enhanced_future_builder/enhanced_future_builder.dart';
@@ -84,7 +83,9 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
               onMapReady: () async => await createFiles(),
             ),
             children: [
-              TileLayer(urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxZoom: 19),
+              TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  maxZoom: 19),
               AssetGeoJSONZones(),
               //////////////// Polygons
               AssetGeoJSONPolygon(),

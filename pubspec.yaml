@@ -1,39 +1,32 @@
 name: power_geojson
 description: A Powerful tool for Geojson with flutter_map, styled from properties, supports esri json, soon supports multiple projection and coordinate systems
-version: 1.0.8+14
+version: 1.0.9+15
 homepage: https://github.com/ymrabti/power_geojson
 
 environment:
-  sdk: ^3.5.4
-  flutter: ">=2.18.0"  
+    sdk: ^3.5.4
+    flutter: ">=2.18.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
-  collection: ^1.18.0
-  console_tools: ^1.0.1
-  enhanced_future_builder: ^2.0.0
-  flutter_map: ^7.0.2
-  geodesy: ^0.10.2
-  geojson_vi: ^2.2.5
-  http: ^1.2.2
-  latlong2: ^0.9.1
-  path_provider: ^2.1.5
-  flutter_map_marker_cluster: ^1.4.0
-  # To do: Add StreamBuilder
+    flutter:
+        sdk: flutter
+    collection: ^1.18.0
+    console_tools: ^1.0.1
+    enhanced_future_builder: ^2.0.0
+    flutter_map: ^7.0.2
+    geodesy: ^0.10.2
+    geojson_vi: ^2.2.5
+    http: ^1.2.2
+    latlong2: ^0.9.1
+    path_provider: ^2.1.5
+    flutter_map_marker_cluster: ^1.4.0
+    # To do: Add StreamBuilder
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^2.0.0
+    flutter_test:
+        sdk: flutter
+    flutter_lints: ^2.0.0
 
 flutter:
-  assets:
-    - packages/power_geojson/icons/drop-pin.png
-  plugin:
-    platforms:
-      android:
-        package: com.ymrabtipacks.power_geojson
-        pluginClass: PowerGeojsonPlugin
-      ios:
-        pluginClass: PowerGeojsonPlugin
+    assets:
+        - packages/power_geojson/icons/drop-pin.png

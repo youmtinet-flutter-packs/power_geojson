@@ -566,7 +566,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.8+14"
+    version: "1.0.9+15"
   proj4dart:
     dependency: "direct main"
     description:

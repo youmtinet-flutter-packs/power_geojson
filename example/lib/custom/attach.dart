@@ -49,7 +49,9 @@ class AttachmentSingle {
 
   @override
   bool operator ==(Object other) {
-    return other is AttachmentSingle && other.runtimeType == runtimeType && other.attachment == attachment;
+    return other is AttachmentSingle &&
+        other.runtimeType == runtimeType &&
+        other.attachment == attachment;
   }
 
   @override

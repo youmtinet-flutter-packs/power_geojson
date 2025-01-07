@@ -50,7 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }) async {
     if (isMultiImage) {
       try {
-        List<XFile> pickedFileList = isMedia ? await _picker.pickMultipleMedia() : await _picker.pickMultiImage();
+        List<XFile> pickedFileList = isMedia
+            ? await _picker.pickMultipleMedia()
+            : await _picker.pickMultiImage();
         _mediaFileList = pickedFileList;
         setState(() {});
       } catch (e) {
@@ -114,7 +116,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   : (mime == null || mime.startsWith('image/')
                       ? Image.file(
                           File(_mediaFileList![index].path),
-                          errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                          errorBuilder: (BuildContext context, Object error,
+                              StackTrace? stackTrace) {
                             return const Center(
                               child: Text('This image type is not supported'),
                             );

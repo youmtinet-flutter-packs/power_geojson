@@ -16,7 +16,8 @@ class FileGeoJSONMarkers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONMarkers.file(
-      File("/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points"),
+      File(
+          "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points"),
       /* builder: (context, markerProps, props) {
         return Transform.scale(
           scale: 1.1,

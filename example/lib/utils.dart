@@ -5,9 +5,12 @@ import 'package:power_geojson/power_geojson.dart';
 
 const String url = 'https://ymrabti.github.io/undisclosed-tools/assets/';
 Future<void> createFiles() async {
-  final String assetsPoints /**********/ = await rootBundle.loadString('assets/file/points.geojson' /**************/);
-  final String assetsLines /***********/ = await rootBundle.loadString('assets/file/lines.geojson' /***************/);
-  final String assetsPolygons /********/ = await rootBundle.loadString('assets/file/polygons.geojson' /************/);
+  final String assetsPoints /**********/ = await rootBundle
+      .loadString('assets/file/points.geojson' /**************/);
+  final String assetsLines /***********/ = await rootBundle
+      .loadString('assets/file/lines.geojson' /***************/);
+  final String assetsPolygons /********/ = await rootBundle
+      .loadString('assets/file/polygons.geojson' /************/);
   await createFile('files_points', /**********/ assetsPoints);
   await createFile('files_lines', /***********/ assetsLines);
   await createFile('files_polygons', /********/ assetsPolygons);
@@ -15,7 +18,8 @@ Future<void> createFiles() async {
 
 Future<File> createFile(String filename, String data) async {
   List<Directory>? list = await getExternalDir();
-  String directory = ((list == null || list.isEmpty) ? Directory('/') : list[0]).path;
+  String directory =
+      ((list == null || list.isEmpty) ? Directory('/') : list[0]).path;
   String path = "$directory/$filename";
   File file = File(path);
   bool exists = await file.exists();

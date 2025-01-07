@@ -43,19 +43,25 @@ class AttachmentsInfos {
 
   Map<String, Object?> toJson() {
     return {
-      AttachmentsInfosEnum.attachmentInfos.name: attachmentInfos.map<Map<String, dynamic>>((data) => data.toJson()).toList(),
+      AttachmentsInfosEnum.attachmentInfos.name: attachmentInfos
+          .map<Map<String, dynamic>>((data) => data.toJson())
+          .toList(),
     };
   }
 
   factory AttachmentsInfos.fromJson(Map<String, Object?> json) {
     return AttachmentsInfos(
-      attachmentInfos: (json[AttachmentsInfosEnum.attachmentInfos.name] as List).map<AttachmentInfos>((data) => AttachmentInfos.fromJson(data as Map<String, Object?>)).toList(),
+      attachmentInfos: (json[AttachmentsInfosEnum.attachmentInfos.name] as List)
+          .map<AttachmentInfos>(
+              (data) => AttachmentInfos.fromJson(data as Map<String, Object?>))
+          .toList(),
     );
   }
 
   factory AttachmentsInfos.fromMap(Map<String, Object?> json, {String? id}) {
     return AttachmentsInfos(
-      attachmentInfos: json[AttachmentsInfosEnum.attachmentInfos.name] as List<AttachmentInfos>,
+      attachmentInfos: json[AttachmentsInfosEnum.attachmentInfos.name]
+          as List<AttachmentInfos>,
     );
   }
 
@@ -70,7 +76,9 @@ class AttachmentsInfos {
 
   @override
   bool operator ==(Object other) {
-    return other is AttachmentsInfos && other.runtimeType == runtimeType && other.attachmentInfos == attachmentInfos;
+    return other is AttachmentsInfos &&
+        other.runtimeType == runtimeType &&
+        other.attachmentInfos == attachmentInfos;
   }
 
   @override
