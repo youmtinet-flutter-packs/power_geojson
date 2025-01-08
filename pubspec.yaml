@@ -1,6 +1,6 @@
 name: power_geojson
 description: A Powerful tool for Geojson with flutter_map, styled from properties, supports esri json, soon supports multiple projection and coordinate systems
-version: 1.0.9+15
+version: 1.0.10+16
 homepage: https://github.com/ymrabti/power_geojson
 
 environment:
@@ -18,7 +18,6 @@ dependencies:
     geojson_vi: ^2.2.5
     http: ^1.2.2
     latlong2: ^0.9.1
-    path_provider: ^2.1.5
     flutter_map_marker_cluster: ^1.4.0
     # To do: Add StreamBuilder
 

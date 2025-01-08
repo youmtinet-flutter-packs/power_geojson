@@ -83,9 +83,7 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
               onMapReady: () async => await createFiles(),
             ),
             children: [
-              TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  maxZoom: 19),
+              TileLayer(urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxZoom: 19),
               AssetGeoJSONZones(),
               //////////////// Polygons
               AssetGeoJSONPolygon(),

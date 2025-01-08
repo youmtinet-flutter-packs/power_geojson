@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:power_geojson/power_geojson.dart';
@@ -16,8 +14,7 @@ class FileGeoJSONPolygon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PowerGeoJSONPolygons.file(
-      File(
-          "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_polygons"),
+      "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_polygons",
       polygonProperties: const PolygonProperties(
         layerProperties: {
           LayerPolygonIndexes.label: 'Name',

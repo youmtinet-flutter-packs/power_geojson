@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:power_geojson/power_geojson.dart';
@@ -15,9 +13,9 @@ class FileGeoJSONMarkers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var file = "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points";
     return PowerGeoJSONMarkers.file(
-      File(
-          "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points"),
+      file,
       /* builder: (context, markerProps, props) {
         return Transform.scale(
           scale: 1.1,

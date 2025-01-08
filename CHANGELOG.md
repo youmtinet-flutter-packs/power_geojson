@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.10+16] - 2025-01-..
+
+- Wasm Support
+
 ## [1.0.9+15] - 2025-01-07
 
 - unplugin android/iOS
