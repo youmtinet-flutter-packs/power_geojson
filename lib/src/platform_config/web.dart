@@ -11,7 +11,7 @@ Future<String> defaultFileLoadBuilder(String path) async {
   return path;
 }
 
-class AppPlatform {
+abstract class AppPlatform {
   static bool isAndroid = false;
   static bool isIOS = false;
   static bool isFuchsia = false;

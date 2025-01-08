@@ -1,7 +1,6 @@
 import 'package:enhanced_future_builder/enhanced_future_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:power_geojson/src/platform_config/platform_export.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:http/http.dart';

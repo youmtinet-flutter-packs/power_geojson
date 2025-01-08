@@ -13,26 +13,28 @@ class FileGeoJSONPolygon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PowerGeoJSONPolygons.file(
-      "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_polygons",
-      polygonProperties: const PolygonProperties(
-        layerProperties: {
-          LayerPolygonIndexes.label: 'Name',
-        },
-        rotateLabel: true,
-        fillColor: Color(0xFF7F0573),
-        isFilled: true,
-        borderColor: Colors.red,
-        labelStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          shadows: [
-            Shadow(blurRadius: 10, color: Colors.black),
-          ],
-        ),
-        labeled: true,
-      ),
-      mapController: _mapController,
-    );
+    return AppPlatform.isWeb
+        ? SizedBox()
+        : PowerGeoJSONPolygons.file(
+            "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_polygons",
+            polygonProperties: const PolygonProperties(
+              layerProperties: {
+                LayerPolygonIndexes.label: 'Name',
+              },
+              rotateLabel: true,
+              fillColor: Color(0xFF7F0573),
+              isFilled: true,
+              borderColor: Colors.red,
+              labelStyle: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(blurRadius: 10, color: Colors.black),
+                ],
+              ),
+              labeled: true,
+            ),
+            mapController: _mapController,
+          );
   }
 }

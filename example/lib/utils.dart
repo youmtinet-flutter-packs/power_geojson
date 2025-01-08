@@ -21,16 +21,20 @@ Future<void> createFiles() async {
   await createFile('files_polygons', /********/ assetsPolygons);
 }
 
-Future<File> createFile(String filename, String data) async {
+Future<void> createFile(String filename, String data) async {
+  if (AppPlatform.isWeb) {
+    return;
+  }
   List<Directory>? list = await getExternalDir();
   String directory = ((list == null || list.isEmpty) ? Directory('/') : list[0]).path;
   String path = "$directory/$filename";
   File file = File(path);
   bool exists = await file.exists();
   if (!exists) {
-    return file..writeAsStringSync(data);
+    file.writeAsStringSync(data);
+    return;
   }
-  return file;
+  return;
 }
 
 Future<PowerGeoPolygon> assetPolygons(String path) async {

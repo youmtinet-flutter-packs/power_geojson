@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart';
-import 'package:power_geojson/src/platform_config/platform_export.dart';
 import 'package:power_geojson/power_geojson.dart';
 export 'properties.dart';
 

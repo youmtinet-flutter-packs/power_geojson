@@ -5,8 +5,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart';
 import 'package:power_geojson/power_geojson.dart';
 
-import '../../platform_config/platform_export.dart';
-
 /// Loads and displays polylines from a file on a map.
 ///
 /// The [_filePolylines] function loads polyline data from a file specified by

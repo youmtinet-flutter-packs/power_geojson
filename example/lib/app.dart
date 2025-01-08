@@ -61,6 +61,7 @@ class _PowerGeojsonSampleAppState extends State<PowerGeojsonSampleApp> {
   Widget _map() {
     int interactiveFlags = InteractiveFlag.doubleTapZoom | //
         InteractiveFlag.drag |
+        InteractiveFlag.scrollWheelZoom |
         InteractiveFlag.pinchZoom |
         InteractiveFlag.pinchMove;
     LatLng center = LatLng(34.926447747065936, -2.3228343908943998);

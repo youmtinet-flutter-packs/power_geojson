@@ -24,7 +24,7 @@ Future<String> defaultFileLoadBuilder(String path) async {
   return throw Exception('File not found');
 }
 
-class AppPlatform {
+abstract class AppPlatform {
   static bool isAndroid = Platform.isAndroid;
   static bool isIOS = Platform.isIOS;
   static bool isFuchsia = Platform.isFuchsia;

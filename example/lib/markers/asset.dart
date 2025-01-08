@@ -16,10 +16,9 @@ class AssetGeoJSONMarkerPoints extends StatelessWidget {
     return PowerGeoJSONMarkers.asset(
       'assets/points.geojson',
       markerProperties: const MarkerProperties(width: 45, height: 45),
-      builder: (context, markerProperties, map) =>
-          FittedBox(child: _markerBuilder()),
+      builder: (context, markerProperties, map) => FittedBox(child: _markerBuilder()),
       mapController: mapController,
-      //   powerClusterOptions: clusterOptions(),
+      powerClusterOptions: clusterOptions(),
       /* builder: (context, MarkerProperties markerProps, props) {
         var prop = props?['Name'];
         return _stackMarkerBuilder(prop);
@@ -36,13 +35,15 @@ class AssetGeoJSONMarkerPoints extends StatelessWidget {
           return Card(
             child: Padding(
               padding: const EdgeInsets.all(12.0),
-              child: Text(properties == null
-                  ? ''
-                  : AssetMarkerProperties.fromJson(properties).name),
+              child: Text(
+                properties == null ? '' : AssetMarkerProperties.fromJson(properties).name,
+              ),
             ),
           );
         },
       ),
+      padding: EdgeInsets.all(50),
+      // zoomToBoundsOnClick: false,
       spiderfyCluster: true,
       builder: (context, markers) => Badge.count(
         count: markers.length,

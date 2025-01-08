@@ -14,21 +14,26 @@ class FileGeoJSONMarkers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var file = "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points";
-    return PowerGeoJSONMarkers.file(
-      file,
-      /* builder: (context, markerProps, props) {
-        return Transform.scale(
-          scale: 1.1,
-          child: SvgPicture.asset(
-            "assets/icons/position.svg",
-            color: HexColor.fromHex(props['color'], const Color(0xFFFFF238)),
-          ),
-        );
-      },*/
-      //   powerClusterOptions: clusterOptions(),
-      markerProperties: const MarkerProperties(),
-      mapController: _mapController,
-    );
+    return AppPlatform.isWeb
+        ? SizedBox()
+        : PowerGeoJSONMarkers.file(
+            file,
+            /* builder: (context, markerProps, props) {
+              return Transform.scale(
+                scale: 1.1,
+                child: SvgPicture.asset(
+                  "assets/icons/position.svg",
+                  color: HexColor.fromHex(
+                    props?['color'],
+                    const Color(0xFFFFF238),
+                  ),
+                ),
+              );
+            }, */
+            //   powerClusterOptions: clusterOptions(),
+            markerProperties: const MarkerProperties(),
+            mapController: _mapController,
+          );
   }
 
   PowerMarkerClusterOptions clusterOptions() {

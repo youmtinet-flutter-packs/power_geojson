@@ -13,10 +13,12 @@ class FileGeoJSONLines extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PowerGeoJSONPolylines.file(
-      "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_lines",
-      polylineProperties: const PolylineProperties(),
-      mapController: _mapController,
-    );
+    return AppPlatform.isWeb
+        ? SizedBox()
+        : PowerGeoJSONPolylines.file(
+            "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_lines",
+            polylineProperties: const PolylineProperties(),
+            mapController: _mapController,
+          );
   }
 }
