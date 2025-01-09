@@ -8,7 +8,7 @@
 .buildlog/
 .history
 .svn/
-**/.github/workflows/
+# **/.github/workflows/
 migrate_working_dir/
 
 # IntelliJ related
