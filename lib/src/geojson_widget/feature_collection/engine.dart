@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:http/http.dart';
 import 'package:power_geojson/power_geojson.dart';
+
 export 'properties.dart';
 
 /// A default network data loader that retrieves data from the specified [uri] using an optional [client] and [headers].

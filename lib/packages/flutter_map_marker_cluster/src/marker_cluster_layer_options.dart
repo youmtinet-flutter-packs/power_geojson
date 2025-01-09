@@ -1,25 +1,59 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:power_geojson/power_geojson.dart';
+import '../../marker_popup/src/controller/popup_controller.dart';
+import '../../marker_popup/src/marker_tap_behavior.dart';
+import '../../marker_popup/src/popup_animation.dart';
+import '../../marker_popup/src/popup_builder.dart';
+import '../../marker_popup/src/popup_snap.dart';
+import '../flutter_map_marker_cluster.dart';
 
-class PowerMarker extends Marker {
-  final Map<String, Object?>? properties;
-  const PowerMarker({
-    required super.point,
-    required super.child,
-    super.alignment,
-    super.height,
-    super.key,
-    super.rotate,
-    super.width,
-    this.properties,
+class PolygonOptions {
+  final Color color;
+  final double borderStrokeWidth;
+  final Color borderColor;
+  final StrokePattern pattern;
+
+  const PolygonOptions({
+    this.color = const Color(0xFF00FF00),
+    this.borderStrokeWidth = 0.0,
+    this.borderColor = const Color(0xFFFFFF00),
+    this.pattern = const StrokePattern.solid(),
   });
 }
 
-class PowerPopupOptions {
+class AnimationsOptions {
+  final Curve fadeInCurve;
+  final Curve fadeOutCurve;
+  final Curve clusterExpandCurve;
+  final Curve clusterCollapseCurve;
+  final Curve sipderifyCurve;
+  final Duration zoom;
+  final Duration fitBound;
+  final Curve fitBoundCurves;
+  final Duration centerMarker;
+  final Curve centerMarkerCurves;
+  final Duration spiderfy;
+
+  const AnimationsOptions({
+    this.zoom = const Duration(milliseconds: 500),
+    this.fitBound = const Duration(milliseconds: 500),
+    this.fadeInCurve = Curves.easeInCubic,
+    this.fadeOutCurve = Curves.easeInCubic,
+    this.clusterExpandCurve = Curves.easeInCubic,
+    this.clusterCollapseCurve = Curves.easeInCubic,
+    this.sipderifyCurve = Curves.fastOutSlowIn,
+    this.centerMarker = const Duration(milliseconds: 500),
+    this.spiderfy = const Duration(milliseconds: 500),
+    this.fitBoundCurves = Curves.fastOutSlowIn,
+    this.centerMarkerCurves = Curves.fastOutSlowIn,
+  });
+}
+
+class PopupOptions {
   /// Used to construct the popup.
-  final PowerPopupBuilder popupBuilder;
+  final PopupBuilder popupBuilder;
 
   /// If a PopupController is provided it can be used to programmatically show
   /// and hide the popup.
@@ -51,26 +85,27 @@ class PowerPopupOptions {
   /// For more information and other options see [MarkerTapBehavior].
   final MarkerTapBehavior markerTapBehavior;
 
-  PowerPopupOptions({
+  PopupOptions({
     required this.popupBuilder,
     this.popupSnap = PopupSnap.markerTop,
-    required this.popupController,
+    PopupController? popupController,
     this.popupAnimation,
     this.markerRotate = false,
     MarkerTapBehavior? markerTapBehavior,
     this.buildPopupOnHover = false,
     this.timeToShowPopupOnHover = 300,
-  }) : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest();
+  })  : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
+        popupController = popupController ?? PopupController();
 }
 
-// In a separate file so it can be exported individually in extension_api.dart
-typedef PowerPopupBuilder = Widget Function(BuildContext context, PowerMarker powerMarker);
-typedef PowerClusterWidgetBuilder = Widget Function(BuildContext context, List<PowerMarker> markers);
+typedef ClusterWidgetBuilder = Widget Function(BuildContext context, List<Marker> markers);
 
-class PowerMarkerClusterOptions {
-  //
+class MarkerClusterLayerOptions {
   /// Cluster builder
-  final PowerClusterWidgetBuilder builder;
+  final ClusterWidgetBuilder builder;
+
+  /// List of markers
+  final List<Marker> markers;
 
   /// If true markers will be counter rotated to the map rotation
   final bool? rotate;
@@ -147,7 +182,7 @@ class PowerMarkerClusterOptions {
   final bool markerChildBehavior;
 
   /// Popup's options that show when tapping markers or via the PopupController.
-  final PowerPopupOptions? popupOptions;
+  final PopupOptions? popupOptions;
 
   final EdgeInsets padding;
   final double maxZoom;
@@ -158,9 +193,10 @@ class PowerMarkerClusterOptions {
   /// to the next suitable integer.
   final bool forceIntegerZoomLevel;
 
-  PowerMarkerClusterOptions({
+  MarkerClusterLayerOptions({
     required this.builder,
     this.rotate,
+    this.markers = const <Marker>[],
     this.size = const Size(30, 30),
     this.computeSize,
     this.alignment,
@@ -189,82 +225,4 @@ class PowerMarkerClusterOptions {
     this.popupOptions,
     this.markerChildBehavior = false,
   });
-
-  MarkerClusterLayerOptions toClusterOptions(PowerMarkerClusterOptions powerClusterOptions, List<PowerMarker> markers) {
-    return MarkerClusterLayerOptions(
-      builder: (context, markers) => builder(context, markers.whereType<PowerMarker>().toList()),
-      rotate: rotate,
-      markers: markers,
-      size: size,
-      computeSize: computeSize,
-      alignment: alignment,
-      maxClusterRadius: maxClusterRadius,
-      disableClusteringAtZoom: disableClusteringAtZoom,
-      animationsOptions: animationsOptions,
-      padding: padding,
-      maxZoom: maxZoom,
-      inside: inside,
-      forceIntegerZoomLevel: forceIntegerZoomLevel,
-      zoomToBoundsOnClick: zoomToBoundsOnClick,
-      centerMarkerOnClick: centerMarkerOnClick,
-      spiderfyCircleRadius: spiderfyCircleRadius,
-      spiderfySpiralDistanceMultiplier: spiderfySpiralDistanceMultiplier,
-      circleSpiralSwitchover: circleSpiralSwitchover,
-      spiderfyShapePositions: spiderfyShapePositions,
-      spiderfyCluster: spiderfyCluster,
-      polygonOptions: polygonOptions,
-      showPolygon: showPolygon,
-      onMarkerTap: onMarkerTap,
-      onMarkerDoubleTap: onMarkerDoubleTap,
-      onMarkerHoverEnter: onMarkerHoverEnter,
-      onMarkerHoverExit: onMarkerHoverExit,
-      onClusterTap: onClusterTap,
-      onMarkersClustered: onMarkersClustered,
-      popupOptions: PopupOptions(
-        buildPopupOnHover: popupOptions?.buildPopupOnHover ?? false,
-        markerRotate: popupOptions?.markerRotate ?? false,
-        markerTapBehavior: popupOptions?.markerTapBehavior,
-        popupAnimation: popupOptions?.popupAnimation,
-        popupController: popupOptions?.popupController,
-        popupSnap: popupOptions?.popupSnap ?? PopupSnap.markerTop,
-        timeToShowPopupOnHover: popupOptions?.timeToShowPopupOnHover ?? 300,
-        popupBuilder: (_, marker) => _markerBuilder(powerClusterOptions, marker),
-      ),
-      markerChildBehavior: markerChildBehavior,
-    );
-  }
-
-  PopupMarkerLayerOptions toPopupOptions(PowerMarkerClusterOptions powerClusterOptions, List<PowerMarker> markers) {
-    return PopupMarkerLayerOptions(
-      markers: markers,
-      markerTapBehavior: popupOptions?.markerTapBehavior,
-      popupController: popupOptions?.popupController,
-      selectedMarkerBuilder: (context, marker) {
-        return SizedBox(width: 45, height: 45, child: _markerBuilder /**/ (powerClusterOptions, marker));
-      },
-      popupDisplayOptions: PopupDisplayOptions(
-        builder: (context, marker) => _markerBuilder /**/ (powerClusterOptions, marker),
-        animation: popupOptions?.popupAnimation,
-        snap: popupOptions?.popupSnap ?? PopupSnap.markerTop,
-      ),
-      //   initiallySelected: ,
-      //   markerCenterAnimation: ,
-      //   onPopupEvent: ,
-    );
-  }
-
-  Widget _markerBuilder(PowerMarkerClusterOptions powerClusterOptions, Marker marker) {
-    PowerPopupOptions? popupOptions = powerClusterOptions.popupOptions;
-    if ((marker is PowerMarker && popupOptions != null)) {
-      return Builder(builder: (context) {
-        return popupOptions.popupBuilder(context, marker);
-      });
-    } else {
-      return Container(
-        width: 50,
-        height: 50,
-        color: Colors.amber,
-      );
-    }
-  }
 }
