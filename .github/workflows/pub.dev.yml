@@ -2,10 +2,10 @@ name: Publish to pub.dev
 
 on:
   push:
-    branches: # Trigger on pushes to the following branches
-      - develop
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+*" # Trigger on version tags
+    branches: # Trigger on pushes to the following branches
+      - develop
   workflow_dispatch: # Allows manual triggering
 
 jobs:
