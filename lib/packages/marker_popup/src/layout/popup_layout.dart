@@ -51,8 +51,8 @@ class PopupLayout {
         return SnapToMapLayout.bottom(mapCamera);
       case PopupSnap.mapCenter:
         return SnapToMapLayout.center(mapCamera);
-      default:
-        return SnapToMarkerLayout.top(mapCamera, popupSpec);
+      //   default:
+      //     return SnapToMarkerLayout.top(mapCamera, popupSpec);
     }
   }
 }

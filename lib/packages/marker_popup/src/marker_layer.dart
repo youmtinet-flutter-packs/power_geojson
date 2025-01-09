@@ -32,7 +32,8 @@ class MarkerLayer extends StatefulWidget {
   State<MarkerLayer> createState() => _MarkerLayerState();
 }
 
-class _MarkerLayerState extends State<MarkerLayer> with SingleTickerProviderStateMixin {
+class _MarkerLayerState extends State<MarkerLayer>
+    with SingleTickerProviderStateMixin {
   late AnimationController _centerMarkerController;
   void Function()? _animationListener;
 
@@ -65,8 +66,10 @@ class _MarkerLayerState extends State<MarkerLayer> with SingleTickerProviderStat
         children: (List<Marker> markers) sync* {
           for (final Marker m in markers) {
             // Resolve real alignment
-            final double left = 0.5 * m.width * ((m.alignment ?? Alignment.center).x + 1);
-            final double top = 0.5 * m.height * ((m.alignment ?? Alignment.center).y + 1);
+            final double left =
+                0.5 * m.width * ((m.alignment ?? Alignment.center).x + 1);
+            final double top =
+                0.5 * m.height * ((m.alignment ?? Alignment.center).y + 1);
             final double right = m.width - left;
             final double bottom = m.height - top;
 
@@ -79,14 +82,19 @@ class _MarkerLayerState extends State<MarkerLayer> with SingleTickerProviderStat
                 Point<double>(pxPoint.x + left, pxPoint.y - bottom),
                 Point<double>(pxPoint.x - right, pxPoint.y + top),
               ),
-            )) continue;
+            )) {
+              continue;
+            }
 
             // Apply map camera to marker position
-            final Point<double> pos = Point<double>(pxPoint.x - map.pixelOrigin.x, pxPoint.y - map.pixelOrigin.y);
+            final Point<double> pos = Point<double>(
+                pxPoint.x - map.pixelOrigin.x, pxPoint.y - map.pixelOrigin.y);
 
             Widget markerChild = m.child;
-            if (widget.layerOptions.selectedMarkerBuilder != null && widget.popupState.isSelected(m)) {
-              markerChild = widget.layerOptions.selectedMarkerBuilder!(context, m);
+            if (widget.layerOptions.selectedMarkerBuilder != null &&
+                widget.popupState.isSelected(m)) {
+              markerChild =
+                  widget.layerOptions.selectedMarkerBuilder!(context, m);
             }
             final GestureDetector markerWithGestureDetector = GestureDetector(
               onTap: () {
@@ -125,7 +133,8 @@ class _MarkerLayerState extends State<MarkerLayer> with SingleTickerProviderStat
   }
 
   void _centerMarker(Marker marker) {
-    final MarkerCenterAnimation? markerLayerAnimation = widget.layerOptions.markerCenterAnimation;
+    final MarkerCenterAnimation? markerLayerAnimation =
+        widget.layerOptions.markerCenterAnimation;
     if (markerLayerAnimation == null) return;
 
     final LatLng center = widget.mapCamera.center;

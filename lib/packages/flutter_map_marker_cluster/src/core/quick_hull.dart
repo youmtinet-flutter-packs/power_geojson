@@ -9,11 +9,14 @@ class _QuickHullDistantPoint {
 
 class QuickHull {
   static double _getDistant(LatLng cpt, List<LatLng> bl) {
-    final double vY = bl[1].latitude - bl[0].latitude, vX = bl[0].longitude - bl[1].longitude;
-    return (vX * (cpt.latitude - bl[0].latitude) + vY * (cpt.longitude - bl[0].longitude));
+    final double vY = bl[1].latitude - bl[0].latitude,
+        vX = bl[0].longitude - bl[1].longitude;
+    return (vX * (cpt.latitude - bl[0].latitude) +
+        vY * (cpt.longitude - bl[0].longitude));
   }
 
-  static _QuickHullDistantPoint _findMostDistantPointFromBaseLine(List<LatLng> baseLine, List<LatLng> latLngs) {
+  static _QuickHullDistantPoint _findMostDistantPointFromBaseLine(
+      List<LatLng> baseLine, List<LatLng> latLngs) {
     double maxD = 0.0;
     LatLng? maxPt;
     final List<LatLng> newPoints = <LatLng>[];
@@ -37,8 +40,10 @@ class QuickHull {
     return _QuickHullDistantPoint(maxPoint: maxPt, newPoints: newPoints);
   }
 
-  static List<LatLng> _buildConvexHull(List<LatLng> baseLine, List<LatLng> latLngs) {
-    final _QuickHullDistantPoint t = _findMostDistantPointFromBaseLine(baseLine, latLngs);
+  static List<LatLng> _buildConvexHull(
+      List<LatLng> baseLine, List<LatLng> latLngs) {
+    final _QuickHullDistantPoint t =
+        _findMostDistantPointFromBaseLine(baseLine, latLngs);
 
     if (t.maxPoint != null) {
       // if there is still a point "outside" the base line

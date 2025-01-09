@@ -31,7 +31,8 @@ class AnimatedPopupContainer extends StatefulWidget {
   State<StatefulWidget> createState() => _AnimatedPopupContainerState();
 }
 
-class _AnimatedPopupContainerState extends State<AnimatedPopupContainer> with PopupContainerMixin {
+class _AnimatedPopupContainerState extends State<AnimatedPopupContainer>
+    with PopupContainerMixin {
   @override
   MapCamera get mapCamera => widget.mapCamera;
 
@@ -41,7 +42,8 @@ class _AnimatedPopupContainerState extends State<AnimatedPopupContainer> with Po
   @override
   PopupSnap get snap => widget.snap;
 
-  final GlobalKey<AnimatedStackState> _animatedStackKey = GlobalKey<AnimatedStackState>();
+  final GlobalKey<AnimatedStackState> _animatedStackKey =
+      GlobalKey<AnimatedStackState>();
 
   late AnimatedStackManager<PopupSpec> _animatedStackManager;
   late StreamSubscription<PopupEvent> _popupStateEventSubscription;
@@ -54,21 +56,25 @@ class _AnimatedPopupContainerState extends State<AnimatedPopupContainer> with Po
 
     _animatedStackManager = AnimatedStackManager<PopupSpec>(
       animatedStackKey: _animatedStackKey,
-      removedItemBuilder: (PopupSpec marker, _, Animation<double> animation) => _buildPopup(marker, animation, allowTap: false),
+      removedItemBuilder: (PopupSpec marker, _, Animation<double> animation) =>
+          _buildPopup(marker, animation, allowTap: false),
       duration: widget.popupAnimation.duration,
       initialItems: widget.popupStateImpl.selectedMarkers.map(PopupSpec.wrap),
     );
-    _popupStateEventSubscription = widget.popupStateImpl.stream.listen(handleEvent);
+    _popupStateEventSubscription =
+        widget.popupStateImpl.stream.listen(handleEvent);
   }
 
   @override
   void didUpdateWidget(covariant AnimatedPopupContainer oldWidget) {
     if (oldWidget.popupStateImpl != widget.popupStateImpl) {
       _popupStateEventSubscription.cancel();
-      _popupStateEventSubscription = widget.popupStateImpl.stream.listen(handleEvent);
+      _popupStateEventSubscription =
+          widget.popupStateImpl.stream.listen(handleEvent);
 
       _animatedStackManager.clear(duration: Duration.zero);
-      for (final PopupSpec selectedPopupSpec in widget.popupStateImpl.selectedPopupSpecs) {
+      for (final PopupSpec selectedPopupSpec
+          in widget.popupStateImpl.selectedPopupSpecs) {
         _animatedStackManager.insert(
           _animatedStackManager.length - 1,
           selectedPopupSpec,
@@ -93,7 +99,9 @@ class _AnimatedPopupContainerState extends State<AnimatedPopupContainer> with Po
         child: AnimatedStack(
           initialItemCount: _animatedStackManager.length,
           key: _animatedStackKey,
-          itemBuilder: (BuildContext context, int index, Animation<double> animation) => _buildPopup(
+          itemBuilder:
+              (BuildContext context, int index, Animation<double> animation) =>
+                  _buildPopup(
             _animatedStackManager[index],
             animation,
           ),

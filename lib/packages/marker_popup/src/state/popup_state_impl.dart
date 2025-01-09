@@ -10,7 +10,8 @@ import 'popup_event_impl.dart';
 import 'popup_state.dart';
 
 class PopupStateImpl with ChangeNotifier implements PopupState {
-  final StreamController<PopupEvent> _streamController = StreamController<PopupEvent>.broadcast();
+  final StreamController<PopupEvent> _streamController =
+      StreamController<PopupEvent>.broadcast();
 
   Stream<PopupEvent> get stream => _streamController.stream;
 
@@ -22,7 +23,9 @@ class PopupStateImpl with ChangeNotifier implements PopupState {
   List<PopupSpec> get selectedPopupSpecs => _selectedPopupSpecs.toList();
 
   @override
-  List<Marker> get selectedMarkers => _selectedPopupSpecs.map((PopupSpec popupSpec) => popupSpec.marker).toList();
+  List<Marker> get selectedMarkers => _selectedPopupSpecs
+      .map((PopupSpec popupSpec) => popupSpec.marker)
+      .toList();
 
   PopupStateImpl({
     List<PopupSpec> initiallySelected = const <PopupSpec>[],

@@ -5,8 +5,10 @@ import 'clippers/theme_switcher_clipper.dart';
 import 'theme_provider.dart';
 
 typedef ChangeTheme = void Function(ThemeData theme);
-typedef BuilderWithSwitcher = Widget Function(BuildContext, ThemeSwitcherState switcher);
-typedef BuilderWithTheme = Widget Function(BuildContext, ThemeSwitcherState switcher, ThemeData theme);
+typedef BuilderWithSwitcher = Widget Function(
+    BuildContext, ThemeSwitcherState switcher);
+typedef BuilderWithTheme = Widget Function(
+    BuildContext, ThemeSwitcherState switcher, ThemeData theme);
 
 class ThemeSwitcher extends StatefulWidget {
   const ThemeSwitcher({
@@ -34,7 +36,8 @@ class ThemeSwitcher extends StatefulWidget {
       ThemeSwitcher.switcher(
         key: key,
         clipper: clipper,
-        builder: (BuildContext ctx, ThemeSwitcherState s) => builder(ctx, s, ThemeModelInheritedNotifier.of(ctx).theme),
+        builder: (BuildContext ctx, ThemeSwitcherState s) =>
+            builder(ctx, s, ThemeModelInheritedNotifier.of(ctx).theme),
       );
 
   final Widget Function(BuildContext) builder;
@@ -44,7 +47,8 @@ class ThemeSwitcher extends StatefulWidget {
   ThemeSwitcherState createState() => ThemeSwitcherState();
 
   static ThemeSwitcherState of(BuildContext context) {
-    final _InheritedThemeSwitcher inherited = context.dependOnInheritedWidgetOfExactType<_InheritedThemeSwitcher>()!;
+    final _InheritedThemeSwitcher inherited =
+        context.dependOnInheritedWidgetOfExactType<_InheritedThemeSwitcher>()!;
     return inherited.data;
   }
 }

@@ -109,7 +109,9 @@ Future<Widget> _filePolylines(
 Future<Widget> _memoryPolylines(
   Uint8List list, {
   required PolylineProperties polylineProperties,
-  Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+  Polyline Function(
+          PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+      builder,
   MapController? mapController,
   Key? key,
 }) async {
@@ -161,7 +163,9 @@ Future<Widget> _memoryPolylines(
 Future<Widget> _assetPolylines(
   String path, {
   required PolylineProperties polylineProperties,
-  Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+  Polyline Function(
+          PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+      builder,
   MapController? mapController,
   Key? key,
 }) async {
@@ -217,11 +221,14 @@ Future<Widget> _networkPolylines(
   Map<String, String>? headers,
   Key? key,
   required PolylineProperties polylineProperties,
-  Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+  Polyline Function(
+          PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+      builder,
   MapController? mapController,
   required Widget Function(int? statusCode)? fallback,
 }) async {
-  Future<Response> Function(Uri url, {Map<String, String>? headers}) method = client == null ? get : client.get;
+  Future<Response> Function(Uri url, {Map<String, String>? headers}) method =
+      client == null ? get : client.get;
   Response response = await method(urlString, headers: headers);
   var string = response.body;
   if (statusCodes.contains(response.statusCode)) {
@@ -233,7 +240,8 @@ Future<Widget> _networkPolylines(
       key: key,
     );
   } else {
-    return fallback?.call(response.statusCode) ?? Text('${response.statusCode}');
+    return fallback?.call(response.statusCode) ??
+        Text('${response.statusCode}');
   }
 }
 
@@ -264,7 +272,9 @@ Widget _string(
   String string, {
   Key? key,
   required PolylineProperties polylineProperties,
-  Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+  Polyline Function(
+          PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+      builder,
   MapController? mapController,
 }) {
   final geojson = PowerGeoJSONFeatureCollection.fromJson(checkEsri(string));
@@ -274,7 +284,8 @@ Widget _string(
       return builder != null
           ? builder(polylineProperties, e.properties)
           : e.geometry.coordinates.toPolyline(
-              polylineProperties: PolylineProperties.fromMap(e.properties, polylineProperties),
+              polylineProperties:
+                  PolylineProperties.fromMap(e.properties, polylineProperties),
             );
     },
   ).toList();
@@ -320,7 +331,9 @@ class PowerGeoJSONPolylines {
     Key? key,
     PolylineProperties polylineProperties = const PolylineProperties(),
     Widget Function(int? statusCode)? fallback,
-    Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+    Polyline Function(
+            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+        builder,
     MapController? mapController,
   }) {
     var uriString = url.toUri();
@@ -368,7 +381,9 @@ class PowerGeoJSONPolylines {
   static Widget asset(
     String url, {
     PolylineProperties polylineProperties = const PolylineProperties(),
-    Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+    Polyline Function(
+            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+        builder,
     MapController? mapController,
     Key? key,
   }) {
@@ -389,7 +404,9 @@ class PowerGeoJSONPolylines {
   static Widget file(
     String file, {
     PolylineProperties polylineProperties = const PolylineProperties(),
-    Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+    Polyline Function(
+            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+        builder,
     MapController? mapController,
     Future<String> Function(String)? fileLoadBuilder,
     Widget Function(int? statusCode)? fallback,
@@ -440,7 +457,9 @@ class PowerGeoJSONPolylines {
   static Widget memory(
     Uint8List bytes, {
     PolylineProperties polylineProperties = const PolylineProperties(),
-    Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+    Polyline Function(
+            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+        builder,
     MapController? mapController,
     Key? key,
   }) {
@@ -484,7 +503,9 @@ class PowerGeoJSONPolylines {
   static Widget string(
     String data, {
     PolylineProperties polylineProperties = const PolylineProperties(),
-    Polyline Function(PolylineProperties polylineProperties, Map<String, dynamic>? map)? builder,
+    Polyline Function(
+            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
+        builder,
     MapController? mapController,
     Key? key,
   }) {

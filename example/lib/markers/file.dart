@@ -13,7 +13,8 @@ class FileGeoJSONMarkers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var file = "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points";
+    var file =
+        "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_points";
     return AppPlatform.isWeb
         ? SizedBox()
         : PowerGeoJSONMarkers.file(

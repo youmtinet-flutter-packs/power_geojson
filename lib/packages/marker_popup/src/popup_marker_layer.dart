@@ -32,7 +32,8 @@ class _PopupMarkerLayerState extends State<PopupMarkerLayer> {
   void _setPopupController() {
     if (_shouldDisposePopupController) _popupControllerImpl.dispose();
 
-    final PopupController? providedPopupController = widget.options.popupController;
+    final PopupController? providedPopupController =
+        widget.options.popupController;
     if (providedPopupController != null) {
       _popupControllerImpl = providedPopupController as PopupControllerImpl;
       _shouldDisposePopupController = false;

@@ -43,7 +43,8 @@ class InheritOrCreatePopupScope extends StatefulWidget {
   });
 
   @override
-  State<InheritOrCreatePopupScope> createState() => _InheritOrCreatePopupScopeState();
+  State<InheritOrCreatePopupScope> createState() =>
+      _InheritOrCreatePopupScopeState();
 }
 
 class _InheritOrCreatePopupScopeState extends State<InheritOrCreatePopupScope> {
@@ -74,7 +75,8 @@ class _InheritOrCreatePopupScopeState extends State<InheritOrCreatePopupScope> {
       _popupState = popupState as PopupStateImpl;
     }
 
-    _mapSubscription ??= MapController.of(context).mapEventStream.listen(_onMapEvent);
+    _mapSubscription ??=
+        MapController.of(context).mapEventStream.listen(_onMapEvent);
 
     // Set the state listener.
     _setPopupStateListener();
@@ -103,7 +105,8 @@ class _InheritOrCreatePopupScopeState extends State<InheritOrCreatePopupScope> {
     _popupStateSubscription = null;
 
     if (widget.onPopupEvent != null) {
-      _popupStateSubscription = _popupState.stream.listen((PopupEvent popupEvent) {
+      _popupStateSubscription =
+          _popupState.stream.listen((PopupEvent popupEvent) {
         widget.onPopupEvent?.call(popupEvent, _popupState.selectedMarkers);
       });
     }
@@ -111,7 +114,10 @@ class _InheritOrCreatePopupScopeState extends State<InheritOrCreatePopupScope> {
 
   void _listenToPopupController() {
     _popupControllerSubscription?.cancel();
-    _popupControllerSubscription = (widget.popupController as PopupControllerImpl).stream.listen((PopupControllerEvent event) {
+    _popupControllerSubscription =
+        (widget.popupController as PopupControllerImpl)
+            .stream
+            .listen((PopupControllerEvent event) {
       _popupState.applyEvent(event);
     });
   }
@@ -120,7 +126,9 @@ class _InheritOrCreatePopupScopeState extends State<InheritOrCreatePopupScope> {
     final int zoom = mapEvent.camera.zoom.ceil();
 
     if (_previousZoom == null || zoom < _previousZoom!) {
-      widget.popupController.hidePopupsWhereSpec((PopupSpec popupSpec) => popupSpec.removeIfZoomLessThan != null && zoom < popupSpec.removeIfZoomLessThan!);
+      widget.popupController.hidePopupsWhereSpec((PopupSpec popupSpec) =>
+          popupSpec.removeIfZoomLessThan != null &&
+          zoom < popupSpec.removeIfZoomLessThan!);
     }
 
     _previousZoom = zoom;

@@ -27,7 +27,8 @@ class ThemeProvider extends StatefulWidget {
   State<ThemeProvider> createState() => _ThemeProviderState();
 }
 
-class _ThemeProviderState extends State<ThemeProvider> with TickerProviderStateMixin {
+class _ThemeProviderState extends State<ThemeProvider>
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late ThemeModel model;
 
@@ -68,7 +69,9 @@ class ThemeModelInheritedNotifier extends InheritedNotifier<ThemeModel> {
   }) : super(key: key, notifier: notifier, child: child);
 
   static ThemeModel of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<ThemeModelInheritedNotifier>()!.notifier!;
+    return context
+        .dependOnInheritedWidgetOfExactType<ThemeModelInheritedNotifier>()!
+        .notifier!;
   }
 }
 
@@ -118,17 +121,23 @@ class ThemeModel extends ChangeNotifier {
     await _saveScreenshot(context);
 
     if (isReversed) {
-      await controller.reverse(from: 1.0).then((void value) => onAnimationFinish?.call());
+      await controller
+          .reverse(from: 1.0)
+          .then((void value) => onAnimationFinish?.call());
     } else {
-      await controller.forward(from: 0.0).then((void value) => onAnimationFinish?.call());
+      await controller
+          .forward(from: 0.0)
+          .then((void value) => onAnimationFinish?.call());
     }
     // Notify listeners when the animation finishes.
     notifyListeners();
   }
 
   Future<void> _saveScreenshot(BuildContext context) async {
-    final RenderRepaintBoundary boundary = previewContainer.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    image = await boundary.toImage(pixelRatio: View.of(context).devicePixelRatio);
+    final RenderRepaintBoundary boundary = previewContainer.currentContext!
+        .findRenderObject() as RenderRepaintBoundary;
+    image =
+        await boundary.toImage(pixelRatio: View.of(context).devicePixelRatio);
     // ignore: deprecated_member_use
     notifyListeners();
   }
@@ -139,8 +148,11 @@ class ThemeModel extends ChangeNotifier {
     super.dispose();
   }
 
-  Offset _getSwitcherCoordinates(GlobalKey<State<StatefulWidget>> switcherGlobalKey, [Offset? tapOffset]) {
-    final RenderBox renderObject = switcherGlobalKey.currentContext!.findRenderObject()! as RenderBox;
+  Offset _getSwitcherCoordinates(
+      GlobalKey<State<StatefulWidget>> switcherGlobalKey,
+      [Offset? tapOffset]) {
+    final RenderBox renderObject =
+        switcherGlobalKey.currentContext!.findRenderObject()! as RenderBox;
     final ui.Size size = renderObject.size;
     return renderObject.localToGlobal(Offset.zero).translate(
           tapOffset?.dx ?? (size.width / 2),

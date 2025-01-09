@@ -94,11 +94,13 @@ class PopupOptions {
     MarkerTapBehavior? markerTapBehavior,
     this.buildPopupOnHover = false,
     this.timeToShowPopupOnHover = 300,
-  })  : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
+  })  : markerTapBehavior =
+            markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
         popupController = popupController ?? PopupController();
 }
 
-typedef ClusterWidgetBuilder = Widget Function(BuildContext context, List<Marker> markers);
+typedef ClusterWidgetBuilder = Widget Function(
+    BuildContext context, List<Marker> markers);
 
 class MarkerClusterLayerOptions {
   /// Cluster builder
@@ -148,7 +150,8 @@ class MarkerClusterLayerOptions {
   final int circleSpiralSwitchover;
 
   /// Make it possible to provide custom function to calculate spiderfy shape positions
-  final List<Point<double>> Function(int, Point<double>)? spiderfyShapePositions;
+  final List<Point<double>> Function(int, Point<double>)?
+      spiderfyShapePositions;
 
   /// If true show polygon then tap on cluster
   final bool showPolygon;

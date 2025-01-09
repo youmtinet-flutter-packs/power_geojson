@@ -12,7 +12,9 @@ class MapCalculator {
     return mapState.project(point) - mapState.pixelOrigin.toDoublePoint();
   }
 
-  Point<double> project(LatLng latLng, {double? zoom}) => mapState.project(latLng, zoom);
+  Point<double> project(LatLng latLng, {double? zoom}) =>
+      mapState.project(latLng, zoom);
 
-  LatLng unproject(Point<double> point, {double? zoom}) => mapState.unproject(point, zoom);
+  LatLng unproject(Point<double> point, {double? zoom}) =>
+      mapState.unproject(point, zoom);
 }

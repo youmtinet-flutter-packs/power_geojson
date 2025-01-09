@@ -86,7 +86,8 @@ class _PopupScopeState extends State<PopupScope> {
     _popupStateSubscription = null;
 
     if (widget.onPopupEvent != null) {
-      _popupStateSubscription = _popupState.stream.listen((PopupEvent popupEvent) {
+      _popupStateSubscription =
+          _popupState.stream.listen((PopupEvent popupEvent) {
         widget.onPopupEvent?.call(popupEvent, _popupState.selectedMarkers);
       });
     }
@@ -98,7 +99,9 @@ class _PopupScopeState extends State<PopupScope> {
 
     final PopupController? popupController = widget.popupController;
     if (popupController != null) {
-      _popupControllerSubscription = (popupController as PopupControllerImpl).stream.listen((PopupControllerEvent event) {
+      _popupControllerSubscription = (popupController as PopupControllerImpl)
+          .stream
+          .listen((PopupControllerEvent event) {
         _popupState.applyEvent(event);
       });
     }

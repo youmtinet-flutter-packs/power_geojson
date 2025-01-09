@@ -29,7 +29,8 @@ class _Derived {
       child.recalculate(recursively: false);
     }
 
-    for (final MarkerClusterNode child in children.whereType<MarkerClusterNode>()) {
+    for (final MarkerClusterNode child
+        in children.whereType<MarkerClusterNode>()) {
       // If `recursively` is true, update children first from the leafs up.
       if (recursively) {
         dfs(child);
@@ -38,7 +39,10 @@ class _Derived {
       markerNodes.addAll(child.markers);
     }
 
-    bounds = markerNodes.isEmpty ? null : LatLngBounds.fromPoints(List<LatLng>.generate(markerNodes.length, (int index) => markerNodes[index].point));
+    bounds = markerNodes.isEmpty
+        ? null
+        : LatLngBounds.fromPoints(List<LatLng>.generate(
+            markerNodes.length, (int index) => markerNodes[index].point));
 
     markers = markerNodes.map((MarkerNode m) => m.marker).toList();
     size = computeSize?.call(markers);
@@ -72,7 +76,8 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   /// LatLong bounds of the transitive markers covered by this cluster.
   /// Note, hacky way of dealing with now null-safe LatLngBounds. Ideally we'd
   // return null here for nodes that are empty and don't have bounds.
-  LatLngBounds get bounds => _derived.bounds ?? LatLngBounds(const LatLng(0, 0), const LatLng(0, 0));
+  LatLngBounds get bounds =>
+      _derived.bounds ?? LatLngBounds(const LatLng(0, 0), const LatLng(0, 0));
 
   Size size() => _derived.size ?? predefinedSize;
 
@@ -104,7 +109,8 @@ class MarkerClusterNode extends MarkerOrClusterNode {
       // draw any smaller levels
       return;
     }
-    assert(zoom <= disableClusteringAtZoom, '$zoom $disableClusteringAtZoom $zoomLevel');
+    assert(zoom <= disableClusteringAtZoom,
+        '$zoom $disableClusteringAtZoom $zoomLevel');
 
     for (final MarkerOrClusterNode child in children) {
       if (child is MarkerNode) {
@@ -113,7 +119,8 @@ class MarkerClusterNode extends MarkerOrClusterNode {
         // OPTIMIZATION: Skip clusters that don't overlap with given recursion
         // (map) bounds. Their markers would get culled later anyway.
         if (recursionBounds.isOverlapping(child.bounds)) {
-          child.recursively(zoomLevel, disableClusteringAtZoom, recursionBounds, fn);
+          child.recursively(
+              zoomLevel, disableClusteringAtZoom, recursionBounds, fn);
         }
       }
     }
@@ -129,8 +136,10 @@ class MarkerClusterNode extends MarkerOrClusterNode {
     final double right = width - left;
     final double bottom = height - top;
 
-    final Point<double> ne = map.project(bounds.northEast) + Point<double>(right, -top);
-    final Point<double> sw = map.project(bounds.southWest) + Point<double>(-left, bottom);
+    final Point<double> ne =
+        map.project(bounds.northEast) + Point<double>(right, -top);
+    final Point<double> sw =
+        map.project(bounds.southWest) + Point<double>(-left, bottom);
 
     return Bounds<double>(ne, sw);
   }

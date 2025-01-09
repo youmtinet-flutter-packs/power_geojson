@@ -6,7 +6,8 @@ import 'popup_controller_event.dart';
 import '../popup_spec.dart';
 
 class PopupControllerImpl implements PopupController {
-  final StreamController<PopupControllerEvent> _streamController = StreamController<PopupControllerEvent>.broadcast();
+  final StreamController<PopupControllerEvent> _streamController =
+      StreamController<PopupControllerEvent>.broadcast();
 
   Stream<PopupControllerEvent> get stream => _streamController.stream;
 

@@ -28,7 +28,8 @@ class PopupMarkerLayerOptions {
 
   /// An optional builder which, if provided, will be used to build markers
   /// which are selected.
-  final Widget Function(BuildContext context, Marker marker)? selectedMarkerBuilder;
+  final Widget Function(BuildContext context, Marker marker)?
+      selectedMarkerBuilder;
 
   /// Setting a [MarkerCenterAnimation] will cause the map to be centered on
   /// a marker when it is tapped. Defaults to not centering on the marker.
@@ -82,5 +83,6 @@ class PopupMarkerLayerOptions {
     this.markerCenterAnimation,
     MarkerTapBehavior? markerTapBehavior,
     this.onPopupEvent,
-  }) : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest();
+  }) : markerTapBehavior =
+            markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest();
 }

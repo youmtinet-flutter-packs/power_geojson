@@ -26,7 +26,9 @@ abstract class SnapToMarkerLayout {
     return PopupLayout(
       contentAlignment: Alignment.centerRight,
       rotationAlignment: Alignment.centerRight,
-      transformationMatrix: popupSpec.markerRotate ? PopupContainerTransform.toLeftOfRotatedMarker(mapCamera, popupSpec) : PopupContainerTransform.toLeftOfMarker(mapCamera, popupSpec),
+      transformationMatrix: popupSpec.markerRotate
+          ? PopupContainerTransform.toLeftOfRotatedMarker(mapCamera, popupSpec)
+          : PopupContainerTransform.toLeftOfMarker(mapCamera, popupSpec),
     );
   }
 
@@ -37,7 +39,9 @@ abstract class SnapToMarkerLayout {
     return PopupLayout(
       contentAlignment: Alignment.bottomCenter,
       rotationAlignment: Alignment.bottomCenter,
-      transformationMatrix: popupSpec.markerRotate ? PopupContainerTransform.toTopOfRotatedMarker(mapCamera, popupSpec) : PopupContainerTransform.toTopOfMarker(mapCamera, popupSpec),
+      transformationMatrix: popupSpec.markerRotate
+          ? PopupContainerTransform.toTopOfRotatedMarker(mapCamera, popupSpec)
+          : PopupContainerTransform.toTopOfMarker(mapCamera, popupSpec),
     );
   }
 
@@ -48,7 +52,9 @@ abstract class SnapToMarkerLayout {
     return PopupLayout(
       contentAlignment: Alignment.centerLeft,
       rotationAlignment: Alignment.centerLeft,
-      transformationMatrix: popupSpec.markerRotate ? PopupContainerTransform.toRightOfRotatedMarker(mapCamera, popupSpec) : PopupContainerTransform.toRightOfMarker(mapCamera, popupSpec),
+      transformationMatrix: popupSpec.markerRotate
+          ? PopupContainerTransform.toRightOfRotatedMarker(mapCamera, popupSpec)
+          : PopupContainerTransform.toRightOfMarker(mapCamera, popupSpec),
     );
   }
 
@@ -59,7 +65,10 @@ abstract class SnapToMarkerLayout {
     return PopupLayout(
       contentAlignment: Alignment.topCenter,
       rotationAlignment: Alignment.topCenter,
-      transformationMatrix: popupSpec.markerRotate ? PopupContainerTransform.toBottomOfRotatedMarker(mapCamera, popupSpec) : PopupContainerTransform.toBottomOfMarker(mapCamera, popupSpec),
+      transformationMatrix: popupSpec.markerRotate
+          ? PopupContainerTransform.toBottomOfRotatedMarker(
+              mapCamera, popupSpec)
+          : PopupContainerTransform.toBottomOfMarker(mapCamera, popupSpec),
     );
   }
 
@@ -70,7 +79,10 @@ abstract class SnapToMarkerLayout {
     return PopupLayout(
       contentAlignment: Alignment.center,
       rotationAlignment: Alignment.center,
-      transformationMatrix: popupSpec.markerRotate ? PopupContainerTransform.toCenterOfRotatedMarker(mapCamera, popupSpec) : PopupContainerTransform.toCenterOfMarker(mapCamera, popupSpec),
+      transformationMatrix: popupSpec.markerRotate
+          ? PopupContainerTransform.toCenterOfRotatedMarker(
+              mapCamera, popupSpec)
+          : PopupContainerTransform.toCenterOfMarker(mapCamera, popupSpec),
     );
   }
 }

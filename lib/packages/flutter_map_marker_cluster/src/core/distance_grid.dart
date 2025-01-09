@@ -16,7 +16,8 @@ class GridKey {
   const GridKey(this.row, this.col);
 
   @override
-  bool operator ==(Object other) => other is GridKey && other.row == row && other.col == col;
+  bool operator ==(Object other) =>
+      other is GridKey && other.row == row && other.col == col;
 
   @override
   int get hashCode => (col << 26) ^ row;
@@ -26,7 +27,8 @@ class DistanceGrid<T> {
   final int cellSize;
   final double _sqCellSize;
 
-  final HashMap<GridKey, List<CellEntry<T>>> _grid = HashMap<GridKey, List<CellEntry<T>>>();
+  final HashMap<GridKey, List<CellEntry<T>>> _grid =
+      HashMap<GridKey, List<CellEntry<T>>>();
   final HashMap<T, GridKey> _objectPoint = HashMap<T, GridKey>();
 
   DistanceGrid(int cellSize)
@@ -114,7 +116,8 @@ class DistanceGrid<T> {
 }
 
 // Row/Col offsets for immediate neighbors ordered by distance.
-const List<({int col, int dist, int row})> _neighbors = <({int dist, int row, int col})>[
+const List<({int col, int dist, int row})> _neighbors =
+    <({int dist, int row, int col})>[
   // Center
   (dist: 0, row: 0, col: 0),
   // Immediate neighbors on the main axis.

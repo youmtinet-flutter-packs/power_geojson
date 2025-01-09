@@ -28,7 +28,8 @@ class SimplePopupContainer extends StatefulWidget {
   State<StatefulWidget> createState() => _SimplePopupContainerState();
 }
 
-class _SimplePopupContainerState extends State<SimplePopupContainer> with PopupContainerMixin {
+class _SimplePopupContainerState extends State<SimplePopupContainer>
+    with PopupContainerMixin {
   late Set<PopupSpec> _selectedPopupSpecs;
 
   late StreamSubscription<PopupEvent> _popupStateEventSubscription;
@@ -45,7 +46,8 @@ class _SimplePopupContainerState extends State<SimplePopupContainer> with PopupC
   @override
   void initState() {
     super.initState();
-    _popupStateEventSubscription = widget.popupStateImpl.stream.listen(handleEvent);
+    _popupStateEventSubscription =
+        widget.popupStateImpl.stream.listen(handleEvent);
     _selectedPopupSpecs = LinkedHashSet<PopupSpec>.from(
       widget.popupStateImpl.selectedMarkers.map(PopupSpec.wrap),
     );
@@ -55,7 +57,8 @@ class _SimplePopupContainerState extends State<SimplePopupContainer> with PopupC
   void didUpdateWidget(covariant SimplePopupContainer oldWidget) {
     if (oldWidget.popupStateImpl != widget.popupStateImpl) {
       _popupStateEventSubscription.cancel();
-      _popupStateEventSubscription = widget.popupStateImpl.stream.listen(handleEvent);
+      _popupStateEventSubscription =
+          widget.popupStateImpl.stream.listen(handleEvent);
       _selectedPopupSpecs
         ..clear()
         ..addAll(widget.popupStateImpl.selectedPopupSpecs);

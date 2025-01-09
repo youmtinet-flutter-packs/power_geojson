@@ -17,5 +17,8 @@ abstract class PopupState with ChangeNotifier {
     return Provider.of<PopupState?>(context, listen: listen);
   }
 
-  static PopupState of(BuildContext context, {bool listen = true}) => maybeOf(context, listen: listen) ?? (throw StateError('`PopupState.of()` called in a context with no PopupState. Consider using PopupScope to add a PopupState to the context'));
+  static PopupState of(BuildContext context, {bool listen = true}) =>
+      maybeOf(context, listen: listen) ??
+      (throw StateError(
+          '`PopupState.of()` called in a context with no PopupState. Consider using PopupScope to add a PopupState to the context'));
 }

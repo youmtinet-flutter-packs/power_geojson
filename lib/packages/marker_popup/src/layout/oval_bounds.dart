@@ -81,7 +81,8 @@ abstract class OvalBounds {
     num cosThetaSquared,
     num sinThetaSquared,
   ) {
-    return sqrt(halfWidthSquared * cosThetaSquared + halfHeightSquared * sinThetaSquared);
+    return sqrt(halfWidthSquared * cosThetaSquared +
+        halfHeightSquared * sinThetaSquared);
   }
 
   static double _boundYImpl(
@@ -90,6 +91,7 @@ abstract class OvalBounds {
     num cosThetaSquared,
     num sinThetaSquared,
   ) {
-    return sqrt(halfWidthSquared * sinThetaSquared + halfHeightSquared * cosThetaSquared);
+    return sqrt(halfWidthSquared * sinThetaSquared +
+        halfHeightSquared * cosThetaSquared);
   }
 }
