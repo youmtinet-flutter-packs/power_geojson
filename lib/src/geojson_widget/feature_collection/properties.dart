@@ -6,26 +6,29 @@ import 'package:power_geojson/power_geojson.dart';
 
 /// Represents a set of properties for customizing the appearance of GeoJSON feature collections.
 ///
-class FeatureCollectionProperties {
+class FeatureCollectionProperties<T extends Object> {
   /// The properties for customizing markers.
   final MarkerProperties markerProperties;
 
   /// The properties for customizing polylines.
-  final PolylineProperties polylineProperties;
+  late PolylineProperties<T> polylineProperties;
 
   /// The properties for customizing polygons.
-  final PolygonProperties polygonProperties;
+  late PolygonProperties<T> polygonProperties;
 
   /// Creates a new instance of FeatureCollectionProperties with optional properties.
   ///
   /// The [markerProperties], [polylineProperties], and [polygonProperties] parameters
   /// allow you to specify custom properties for markers, polylines, and polygons within
   /// the GeoJSON feature collection.
-  const FeatureCollectionProperties({
+  FeatureCollectionProperties({
     this.markerProperties = const MarkerProperties(),
-    this.polylineProperties = const PolylineProperties(),
-    this.polygonProperties = const PolygonProperties(),
-  });
+    required PolylineProperties<T>? polylineProperts,
+    required PolygonProperties<T>? polygonProperts,
+  }) {
+    this.polylineProperties = polylineProperts ?? PolylineProperties<T>();
+    this.polygonProperties = polygonProperts ?? PolygonProperties<T>();
+  }
 
   /// Creates a new FeatureCollectionProperties instance with updated properties.
   ///
@@ -37,36 +40,30 @@ class FeatureCollectionProperties {
   /// - [polygonProperties]: The properties for customizing polygons.
   ///
   /// Returns a new FeatureCollectionProperties instance with updated properties.
-  FeatureCollectionProperties copyWith({
+  FeatureCollectionProperties<T> copyWith({
     MarkerProperties? markerProperties,
-    PolylineProperties? polylineProperties,
-    PolygonProperties? polygonProperties,
+    PolylineProperties<T>? polylineProperties,
+    PolygonProperties<T>? polygonProperties,
   }) {
-    return FeatureCollectionProperties(
+    return FeatureCollectionProperties<T>(
       markerProperties: markerProperties ?? this.markerProperties,
-      polylineProperties: polylineProperties ?? this.polylineProperties,
-      polygonProperties: polygonProperties ?? this.polygonProperties,
+      polylineProperts: polylineProperties ?? this.polylineProperties,
+      polygonProperts: polygonProperties ?? this.polygonProperties,
     );
   }
 
   @override
-  String toString() =>
-      'FeatureCollectionProperties(markerProperties: $markerProperties, polylineProperties: $polylineProperties, polygonProperties: $polygonProperties)';
+  String toString() => 'FeatureCollectionProperties(markerProperties: $markerProperties, polylineProperties: $polylineProperties, polygonProperties: $polygonProperties)';
 
   @override
-  bool operator ==(covariant FeatureCollectionProperties other) {
+  bool operator ==(covariant FeatureCollectionProperties<T> other) {
     if (identical(this, other)) return true;
 
-    return other.markerProperties == markerProperties &&
-        other.polylineProperties == polylineProperties &&
-        other.polygonProperties == polygonProperties;
+    return other.markerProperties == markerProperties && other.polylineProperties == polylineProperties && other.polygonProperties == polygonProperties;
   }
 
   @override
-  int get hashCode =>
-      markerProperties.hashCode ^
-      polylineProperties.hashCode ^
-      polygonProperties.hashCode;
+  int get hashCode => markerProperties.hashCode ^ polylineProperties.hashCode ^ polygonProperties.hashCode;
 }
 
 /// Represents a feature in GeoJSON data, which can include geometry and associated properties.
@@ -94,9 +91,8 @@ abstract class PowerGeoFeature {
     List<double>? bbox = feature.bbox;
     String? title = feature.title;
     dynamic id = feature.id;
-    if (geometry == null) return [];
-    return parseGeometry(geometry,
-        properties: properties, bbox: bbox, title: title, id: id);
+    if (geometry == null) return <PowerGeoFeature>[];
+    return parseGeometry(geometry, properties: properties, bbox: bbox, title: title, id: id);
   }
 
   /// Parses a GeoJSON geometry and returns a list of PowerGeoFeature instances.
@@ -117,9 +113,9 @@ abstract class PowerGeoFeature {
   }) {
     switch (geometry.type) {
       case GeoJSONType.point:
-        var geom = geometry as GeoJSONPoint;
-        var coordinates = geom.coordinates;
-        return [
+        GeoJSONPoint geom = geometry as GeoJSONPoint;
+        List<double> coordinates = geom.coordinates;
+        return <PowerGeoFeature>[
           PowerGeoPoint(
             geometry: GeoJSONPoint(coordinates),
             properties: properties,
@@ -129,10 +125,10 @@ abstract class PowerGeoFeature {
           ),
         ];
       case GeoJSONType.multiPoint:
-        var geom = geometry as GeoJSONMultiPoint;
-        var coordinates = geom.coordinates;
+        GeoJSONMultiPoint geom = geometry as GeoJSONMultiPoint;
+        List<List<double>> coordinates = geom.coordinates;
         return coordinates
-            .map((e) => PowerGeoPoint(
+            .map((List<double> e) => PowerGeoPoint(
                   geometry: GeoJSONPoint(e),
                   properties: properties,
                   bbox: bbox,
@@ -141,9 +137,9 @@ abstract class PowerGeoFeature {
                 ))
             .toList();
       case GeoJSONType.lineString:
-        var geom = geometry as GeoJSONLineString;
-        var coordinates = geom.coordinates;
-        return [
+        GeoJSONLineString geom = geometry as GeoJSONLineString;
+        List<List<double>> coordinates = geom.coordinates;
+        return <PowerGeoFeature>[
           PowerGeoLineString(
             geometry: GeoJSONLineString(coordinates),
             properties: properties,
@@ -153,10 +149,10 @@ abstract class PowerGeoFeature {
           ),
         ];
       case GeoJSONType.multiLineString:
-        var geom = geometry as GeoJSONMultiLineString;
-        var coordinates = geom.coordinates;
+        GeoJSONMultiLineString geom = geometry as GeoJSONMultiLineString;
+        List<List<List<double>>> coordinates = geom.coordinates;
         return coordinates
-            .map((e) => PowerGeoLineString(
+            .map((List<List<double>> e) => PowerGeoLineString(
                   geometry: GeoJSONLineString(e),
                   properties: properties,
                   bbox: bbox,
@@ -165,9 +161,9 @@ abstract class PowerGeoFeature {
                 ))
             .toList();
       case GeoJSONType.polygon:
-        var geom = geometry as GeoJSONPolygon;
-        var coordinates = geom.coordinates;
-        return [
+        GeoJSONPolygon geom = geometry as GeoJSONPolygon;
+        List<List<List<double>>> coordinates = geom.coordinates;
+        return <PowerGeoFeature>[
           PowerGeoPolygon(
             geometry: GeoJSONPolygon(coordinates),
             properties: properties,
@@ -177,10 +173,10 @@ abstract class PowerGeoFeature {
           ),
         ];
       case GeoJSONType.multiPolygon:
-        var geom = geometry as GeoJSONMultiPolygon;
-        var coordinates = geom.coordinates;
+        GeoJSONMultiPolygon geom = geometry as GeoJSONMultiPolygon;
+        List<List<List<List<double>>>> coordinates = geom.coordinates;
         return coordinates
-            .map((e) => PowerGeoPolygon(
+            .map((List<List<List<double>>> e) => PowerGeoPolygon(
                   geometry: GeoJSONPolygon(e),
                   properties: properties,
                   bbox: bbox,
@@ -189,9 +185,9 @@ abstract class PowerGeoFeature {
                 ))
             .toList();
       case GeoJSONType.feature:
-        var geom = geometry as GeoJSONFeature;
-        var geometry2 = geom.geometry;
-        if (geometry2 == null) return [];
+        GeoJSONFeature geom = geometry as GeoJSONFeature;
+        GeoJSONGeometry? geometry2 = geom.geometry;
+        if (geometry2 == null) return <PowerGeoFeature>[];
         return parseGeometry(
           geometry2,
           properties: properties,
@@ -204,7 +200,7 @@ abstract class PowerGeoFeature {
         List<GeoJSONFeature?> features = geom.features;
         Iterable<GeoJSONFeature> notNull = features.nonNulls;
         Iterable<List<PowerGeoFeature>?> featuresParse = notNull.map(
-          (e) {
+          (GeoJSONFeature e) {
             GeoJSONGeometry? geometry3 = e.geometry;
             if (geometry3 == null) return null;
             return parseGeometry(
@@ -217,11 +213,11 @@ abstract class PowerGeoFeature {
           },
         );
         Iterable<List<PowerGeoFeature>> whereNotNull = featuresParse.nonNulls;
-        return whereNotNull.expand((e) => e).toList();
+        return whereNotNull.expand((List<PowerGeoFeature> e) => e).toList();
       case GeoJSONType.geometryCollection:
-        var geom = geometry as GeoJSONGeometryCollection;
-        var coordinates = geom.geometries.map(
-          (e) => parseGeometry(
+        GeoJSONGeometryCollection geom = geometry as GeoJSONGeometryCollection;
+        Iterable<List<PowerGeoFeature>> coordinates = geom.geometries.map(
+          (GeoJSONGeometry e) => parseGeometry(
             e,
             properties: properties,
             bbox: bbox,
@@ -229,7 +225,7 @@ abstract class PowerGeoFeature {
             id: id,
           ),
         );
-        return coordinates.expand((e) => e).toList();
+        return coordinates.expand((List<PowerGeoFeature> e) => e).toList();
     }
   }
 
@@ -255,10 +251,7 @@ abstract class PowerGeoFeature {
   bool operator ==(covariant PowerGeoFeature other) {
     if (identical(this, other)) return true;
 
-    return mapEquals(other.properties, properties) &&
-        foundation.listEquals(other.bbox, bbox) &&
-        other.title == title &&
-        other.id == id;
+    return mapEquals(other.properties, properties) && foundation.listEquals(other.bbox, bbox) && other.title == title && other.id == id;
   }
 
   @override
@@ -348,9 +341,9 @@ class PowerGeoJSONFeatureCollection {
   /// Returns a map representation of the PowerGeoJSONFeatureCollection.
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'geoJSONPoints': geoJSONPoints.map((x) => x.toMap()).toList(),
-      'geoJSONLineStrings': geoJSONLineStrings.map((x) => x.toMap()).toList(),
-      'geoJSONPolygons': geoJSONPolygons.map((x) => x.toMap()).toList(),
+      'geoJSONPoints': geoJSONPoints.map((PowerGeoPoint x) => x.toMap()).toList(),
+      'geoJSONLineStrings': geoJSONLineStrings.map((PowerGeoLineString x) => x.toMap()).toList(),
+      'geoJSONPolygons': geoJSONPolygons.map((PowerGeoPolygon x) => x.toMap()).toList(),
     };
   }
 
@@ -360,42 +353,33 @@ class PowerGeoJSONFeatureCollection {
   ///
   /// Returns a PowerGeoJSONFeatureCollection instance.
   factory PowerGeoJSONFeatureCollection.fromMap(Map<String, dynamic> json) {
-    var type = json['type'];
-    var featureCollectionDefault = PowerGeoJSONFeatureCollection(
-      geoJSONPoints: [],
-      geoJSONLineStrings: [],
-      geoJSONPolygons: [],
+    Object? type = json['type'];
+    PowerGeoJSONFeatureCollection featureCollectionDefault = PowerGeoJSONFeatureCollection(
+      geoJSONPoints: <PowerGeoPoint>[],
+      geoJSONLineStrings: <PowerGeoLineString>[],
+      geoJSONPolygons: <PowerGeoPolygon>[],
     );
     switch (type) {
       case 'Point':
         GeoJSONPoint point = GeoJSONPoint.fromMap(json);
-        var featureCollectionPoint = PowerGeoJSONFeatureCollection(
-          geoJSONPoints: [PowerGeoPoint(geometry: point)],
-          geoJSONLineStrings: [],
-          geoJSONPolygons: [],
+        PowerGeoJSONFeatureCollection featureCollectionPoint = PowerGeoJSONFeatureCollection(
+          geoJSONPoints: <PowerGeoPoint>[PowerGeoPoint(geometry: point)],
+          geoJSONLineStrings: <PowerGeoLineString>[],
+          geoJSONPolygons: <PowerGeoPolygon>[],
         );
         return featureCollectionPoint;
 
       // ... (other cases for different GeoJSON types)
 
       case 'FeatureCollection':
-        GeoJSONFeatureCollection geoJSONFeatureCollection =
-            GeoJSONFeatureCollection.fromMap(json);
-        var features = geoJSONFeatureCollection.features;
-        List<GeoJSONFeature> listFeatures = features
-            .where((element) => element != null)
-            .map((e) => e as GeoJSONFeature)
-            .toList();
-        List<PowerGeoFeature> listGeoFeatures = listFeatures
-            .map(PowerGeoFeature.parseFeature)
-            .expand((e) => e)
-            .toList();
+        GeoJSONFeatureCollection geoJSONFeatureCollection = GeoJSONFeatureCollection.fromMap(json);
+        List<GeoJSONFeature?> features = geoJSONFeatureCollection.features;
+        List<GeoJSONFeature> listFeatures = features.where((GeoJSONFeature? element) => element != null).map((GeoJSONFeature? e) => e as GeoJSONFeature).toList();
+        List<PowerGeoFeature> listGeoFeatures = listFeatures.map(PowerGeoFeature.parseFeature).expand((List<PowerGeoFeature> e) => e).toList();
         return PowerGeoJSONFeatureCollection(
           geoJSONPoints: listGeoFeatures.whereType<PowerGeoPoint>().toList(),
-          geoJSONLineStrings:
-              listGeoFeatures.whereType<PowerGeoLineString>().toList(),
-          geoJSONPolygons:
-              listGeoFeatures.whereType<PowerGeoPolygon>().toList(),
+          geoJSONLineStrings: listGeoFeatures.whereType<PowerGeoLineString>().toList(),
+          geoJSONPolygons: listGeoFeatures.whereType<PowerGeoPolygon>().toList(),
         );
       default:
         return featureCollectionDefault;
@@ -412,24 +396,18 @@ class PowerGeoJSONFeatureCollection {
   /// - [source]: A JSON string representing the PowerGeoJSONFeatureCollection.
   ///
   /// Returns a PowerGeoJSONFeatureCollection instance.
-  factory PowerGeoJSONFeatureCollection.fromJson(String source) =>
-      PowerGeoJSONFeatureCollection.fromMap(
-          json.decode(source) as Map<String, dynamic>);
+  factory PowerGeoJSONFeatureCollection.fromJson(String source) => PowerGeoJSONFeatureCollection.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(covariant PowerGeoJSONFeatureCollection other) {
     if (identical(this, other)) return true;
 
-    return foundation.listEquals(other.geoJSONPoints, geoJSONPoints) &&
-        foundation.listEquals(other.geoJSONLineStrings, geoJSONLineStrings) &&
-        foundation.listEquals(other.geoJSONPolygons, geoJSONPolygons);
+    return foundation.listEquals(other.geoJSONPoints, geoJSONPoints) && foundation.listEquals(other.geoJSONLineStrings, geoJSONLineStrings) && foundation.listEquals(other.geoJSONPolygons, geoJSONPolygons);
   }
 
   @override
   int get hashCode {
-    return geoJSONPoints.hashCode ^
-        geoJSONLineStrings.hashCode ^
-        geoJSONPolygons.hashCode;
+    return geoJSONPoints.hashCode ^ geoJSONLineStrings.hashCode ^ geoJSONPolygons.hashCode;
   }
 }
 

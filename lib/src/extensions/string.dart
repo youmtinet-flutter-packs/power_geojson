@@ -12,7 +12,7 @@ extension HexColor on Color {
   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
   static Color fromHex(String? hexString, Color fallColor) {
     if (hexString == null) return fallColor;
-    final buffer = StringBuffer();
+    final StringBuffer buffer = StringBuffer();
     if (hexString.length == 6 || hexString.length == 7) {
       buffer.write('ff');
       buffer.write(hexString.replaceFirst('#', ''));
@@ -37,9 +37,9 @@ extension LantLngX<T> on List<List<double>> {
   ///
   /// Returns a list of LatLng objects.
   List<LatLng> toLatLng() {
-    return map((e) {
-      var x = e[1]; // Latitude
-      var y = e[0]; // Longitude
+    return map((List<double> e) {
+      double x = e[1]; // Latitude
+      double y = e[0]; // Longitude
       return LatLng(x, y);
     }).toList();
   }

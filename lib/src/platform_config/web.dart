@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 Future<String> strUint8List(Uint8List list) async {
-  var string = utf8.decode(list);
+  String string = utf8.decode(list);
   return string;
 }
 

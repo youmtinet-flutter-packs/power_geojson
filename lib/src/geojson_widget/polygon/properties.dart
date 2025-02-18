@@ -50,9 +50,9 @@ enum LayerPolygonIndexes {
 ///   borderStokeWidth: 2,
 /// );
 /// ```
-class PolygonProperties {
+class PolygonProperties<T extends Object> {
   /// Default fill color for polygons.
-  static const defFillColor = Color(0x9C2195F3);
+  static const Color defFillColor = Color(0x9C2195F3);
 
   /// Default value indicating whether holes should disable their border.
   static const bool defDisableHolesBorder = true;
@@ -76,8 +76,7 @@ class PolygonProperties {
   static const StrokePattern defIsDotted = StrokePattern.solid();
 
   /// Default label placement for polygons.
-  static const PolygonLabelPlacement defLabelPlacement =
-      PolygonLabelPlacement.polylabel;
+  static const PolygonLabelPlacement defLabelPlacement = PolygonLabelPlacement.polylabel;
 
   /// Default label style for polygons.
   static const TextStyle defLabelStyle = TextStyle();
@@ -126,6 +125,9 @@ class PolygonProperties {
   /// Indicates whether labels should be rotated.
   final bool rotateLabel;
 
+  /// hint value.
+  final T? hintValue;
+
   /// The stroke cap style for polygons.
   final StrokeCap strokeCap;
 
@@ -160,6 +162,7 @@ class PolygonProperties {
     this.strokeJoin = PolygonProperties.defStrokeJoin,
     this.fillColor = PolygonProperties.defFillColor,
     this.label = PolygonProperties.defLabel,
+    this.hintValue,
     this.borderStokeWidth = PolygonProperties.defBorderStokeWidth,
     this.borderColor = PolygonProperties.defBorderColor,
     this.disableHolesBorder = PolygonProperties.defDisableHolesBorder,
@@ -186,43 +189,37 @@ class PolygonProperties {
   ///   PolygonProperties(),
   /// );
   /// ```
-  static PolygonProperties fromMap(
+  static PolygonProperties<T> fromMap<T extends Object>(
     Map<String, dynamic>? properties,
-    PolygonProperties polygonLayerProperties,
+    PolygonProperties<T> polygonLayerProperties,
   ) {
-    var layerProperties = polygonLayerProperties.layerProperties;
+    Map<LayerPolygonIndexes, String>? layerProperties = polygonLayerProperties.layerProperties;
     if (properties != null && layerProperties != null) {
       // fill
-      final String? keyPropertieFillColor =
-          layerProperties[LayerPolygonIndexes.fillColor];
-      var isFilledMap = keyPropertieFillColor != null;
+      final String? keyPropertieFillColor = layerProperties[LayerPolygonIndexes.fillColor];
+      bool isFilledMap = keyPropertieFillColor != null;
       String hexString = '${properties[keyPropertieFillColor]}';
       Color? polyLayProp = polygonLayerProperties.fillColor;
-      final Color? fillColor =
-          polyLayProp == null ? null : HexColor.fromHex(hexString, polyLayProp);
+      final Color? fillColor = polyLayProp == null ? null : HexColor.fromHex(hexString, polyLayProp);
       // border color
-      final String? layerPropertieBorderColor =
-          layerProperties[LayerPolygonIndexes.borderColor];
+      final String? layerPropertieBorderColor = layerProperties[LayerPolygonIndexes.borderColor];
       String hexString2 = '${properties[layerPropertieBorderColor]}';
-      var fall = polygonLayerProperties.borderColor;
+      Color fall = polygonLayerProperties.borderColor;
       final Color borderColor = HexColor.fromHex(hexString2, fall);
       // border width
-      var layerPropertieBWidth =
-          layerProperties[LayerPolygonIndexes.borderStokeWidth];
+      String? layerPropertieBWidth = layerProperties[LayerPolygonIndexes.borderStokeWidth];
       // label
       final String? label = layerProperties[LayerPolygonIndexes.label];
       final bool labeled = properties[label] != null;
-      var isLabelled = labeled && polygonLayerProperties.labeled;
-      String label2 =
-          labeled ? '${properties[label]}' : polygonLayerProperties.label;
-      return PolygonProperties(
+      bool isLabelled = labeled && polygonLayerProperties.labeled;
+      String label2 = labeled ? '${properties[label]}' : polygonLayerProperties.label;
+      return PolygonProperties<T>(
         isFilled: isFilledMap && polygonLayerProperties.isFilled,
         fillColor: fillColor,
         borderColor: borderColor,
-        borderStokeWidth: (properties[layerPropertieBWidth] ??
-                polygonLayerProperties.borderStokeWidth)
-            .toDouble(),
+        borderStokeWidth: (properties[layerPropertieBWidth] ?? polygonLayerProperties.borderStokeWidth).toDouble(),
         label: label2,
+        layerProperties: layerProperties,
         labeled: isLabelled,
         disableHolesBorder: polygonLayerProperties.disableHolesBorder,
         pattern: polygonLayerProperties.pattern,

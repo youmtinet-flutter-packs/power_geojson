@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:power_geojson/power_geojson.dart';
 
 /// Loads and displays polylines from a file on a map.
@@ -43,22 +44,22 @@ import 'package:power_geojson/power_geojson.dart';
 /// widget displaying "Not Found".
 ///
 /// Returns a widget displaying the loaded polylines on the map.
-Future<Widget> _filePolylines(
+Future<Widget> _filePolylines<T extends Object>(
   String file, {
-  required PolylineProperties polylineProperties,
+  required PolylineProperties<T> polylineProperties,
   required Future<String> Function(
     String filePath,
   ) fileLoadBuilder,
-  Polyline Function(
-    PolylineProperties polylineProperties,
-    Map<String, dynamic>? map,
+  Polyline<T> Function(
+    List<LatLng> points,
+    Map<String, Object?>? map,
   )? builder,
   MapController? mapController,
   Key? key,
   required Widget Function(int? statusCode)? fallback,
 }) async {
   try {
-    final string = await fileLoadBuilder(file);
+    final String string = await fileLoadBuilder(file);
     return _string(
       checkEsri(string),
       polylineProperties: polylineProperties,
@@ -106,12 +107,13 @@ Future<Widget> _filePolylines(
 /// polylines that are outside the map's viewport, improving performance.
 ///
 /// Returns a widget displaying the loaded polylines on the map.
-Future<Widget> _memoryPolylines(
+Future<Widget> _memoryPolylines<T extends Object>(
   Uint8List list, {
-  required PolylineProperties polylineProperties,
-  Polyline Function(
-          PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-      builder,
+  required PolylineProperties<T> polylineProperties,
+  Polyline<T> Function(
+    List<LatLng> points,
+    Map<String, Object?>? map,
+  )? builder,
   MapController? mapController,
   Key? key,
 }) async {
@@ -160,16 +162,17 @@ Future<Widget> _memoryPolylines(
 /// polylines that are outside the map's viewport, improving performance.
 ///
 /// Returns a widget displaying the loaded polylines on the map.
-Future<Widget> _assetPolylines(
+Future<Widget> _assetPolylines<T extends Object>(
   String path, {
-  required PolylineProperties polylineProperties,
-  Polyline Function(
-          PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-      builder,
+  required PolylineProperties<T> polylineProperties,
+  Polyline<T> Function(
+    List<LatLng> points,
+    Map<String, Object?>? map,
+  )? builder,
   MapController? mapController,
   Key? key,
 }) async {
-  final string = await rootBundle.loadString(path);
+  final String string = await rootBundle.loadString(path);
   return _string(
     checkEsri(string),
     polylineProperties: polylineProperties,
@@ -214,23 +217,23 @@ Future<Widget> _assetPolylines(
 /// polylines that are outside the map's viewport, improving performance.
 ///
 /// Returns a widget displaying the loaded polylines on the map.
-Future<Widget> _networkPolylines(
+Future<Widget> _networkPolylines<T extends Object>(
   Uri urlString, {
   Client? client,
   required List<int> statusCodes,
   Map<String, String>? headers,
   Key? key,
-  required PolylineProperties polylineProperties,
-  Polyline Function(
-          PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-      builder,
+  required PolylineProperties<T> polylineProperties,
+  Polyline<T> Function(
+    List<LatLng> points,
+    Map<String, Object?>? map,
+  )? builder,
   MapController? mapController,
   required Widget Function(int? statusCode)? fallback,
 }) async {
-  Future<Response> Function(Uri url, {Map<String, String>? headers}) method =
-      client == null ? get : client.get;
+  Future<Response> Function(Uri url, {Map<String, String>? headers}) method = client == null ? get : client.get;
   Response response = await method(urlString, headers: headers);
-  var string = response.body;
+  String string = response.body;
   if (statusCodes.contains(response.statusCode)) {
     return _string(
       checkEsri(string),
@@ -240,8 +243,7 @@ Future<Widget> _networkPolylines(
       key: key,
     );
   } else {
-    return fallback?.call(response.statusCode) ??
-        Text('${response.statusCode}');
+    return fallback?.call(response.statusCode) ?? Text('${response.statusCode}');
   }
 }
 
@@ -268,31 +270,31 @@ Future<Widget> _networkPolylines(
 /// polylines that are outside the map's viewport, improving performance.
 ///
 /// Returns a widget displaying the parsed polylines on the map.
-Widget _string(
+Widget _string<T extends Object>(
   String string, {
   Key? key,
-  required PolylineProperties polylineProperties,
-  Polyline Function(
-          PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-      builder,
+  required PolylineProperties<T> polylineProperties,
+  Polyline<T> Function(
+    List<LatLng> points,
+    Map<String, Object?>? map,
+  )? builder,
   MapController? mapController,
 }) {
-  final geojson = PowerGeoJSONFeatureCollection.fromJson(checkEsri(string));
+  final PowerGeoJSONFeatureCollection geojson = PowerGeoJSONFeatureCollection.fromJson(checkEsri(string));
 
-  var polylines = geojson.geoJSONLineStrings.map(
-    (e) {
+  List<Polyline<T>> polylines = geojson.geoJSONLineStrings.map(
+    (PowerGeoLineString e) {
       return builder != null
-          ? builder(polylineProperties, e.properties)
-          : e.geometry.coordinates.toPolyline(
-              polylineProperties:
-                  PolylineProperties.fromMap(e.properties, polylineProperties),
+          ? builder(e.geometry.coordinates.toLatLng(), e.properties)
+          : e.geometry.coordinates.toPolyline<T>(
+              polylineProperties: PolylineProperties.fromMap(e.properties, polylineProperties),
             );
     },
   ).toList();
 
-  List<List<double>?> bbox = geojson.geoJSONPoints.map((e) => e.bbox).toList();
+  List<List<double>?> bbox = geojson.geoJSONPoints.map((PowerGeoPoint e) => e.bbox).toList();
   zoomTo(bbox, mapController);
-  return PolylineLayer(
+  return PolylineLayer<T>(
     polylines: polylines,
     key: key,
   );
@@ -322,28 +324,29 @@ class PowerGeoJSONPolylines {
   /// polylines that are outside the map's viewport, improving performance.
   ///
   /// Returns a widget displaying the loaded polylines on the map.
-  static Widget network(
+  static Widget network<T extends Object>(
     String url, {
     Client? client,
-    List<int> statusCodes = const [200],
+    List<int> statusCodes = const <int>[200],
     Map<String, String>? headers,
     // layer
     Key? key,
-    PolylineProperties polylineProperties = const PolylineProperties(),
+    PolylineProperties<T>? polylineProperties,
     Widget Function(int? statusCode)? fallback,
-    Polyline Function(
-            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-        builder,
+    Polyline<T> Function(
+      List<LatLng> points,
+      Map<String, Object?>? map,
+    )? builder,
     MapController? mapController,
   }) {
-    var uriString = url.toUri();
-    return EnhancedFutureBuilder(
+    Uri uriString = url.toUri();
+    return EnhancedFutureBuilder<Widget>(
       future: _networkPolylines(
         uriString,
         headers: headers,
         client: client,
         statusCodes: statusCodes,
-        polylineProperties: polylineProperties,
+        polylineProperties: polylineProperties ?? PolylineProperties<T>(),
         builder: builder,
         fallback: fallback,
         mapController: mapController,
@@ -378,19 +381,20 @@ class PowerGeoJSONPolylines {
   /// polylines that are outside the map's viewport, improving performance.
   ///
   /// Returns a widget displaying the loaded polylines on the map.
-  static Widget asset(
+  static Widget asset<T extends Object>(
     String url, {
-    PolylineProperties polylineProperties = const PolylineProperties(),
-    Polyline Function(
-            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-        builder,
+    PolylineProperties<T>? polylineProperties,
+    Polyline<T> Function(
+      List<LatLng> points,
+      Map<String, Object?>? map,
+    )? builder,
     MapController? mapController,
     Key? key,
   }) {
-    return EnhancedFutureBuilder(
+    return EnhancedFutureBuilder<Widget>(
       future: _assetPolylines(
         url,
-        polylineProperties: polylineProperties,
+        polylineProperties: polylineProperties ?? PolylineProperties<T>(),
         builder: builder,
         mapController: mapController,
         key: key,
@@ -401,12 +405,13 @@ class PowerGeoJSONPolylines {
     );
   }
 
-  static Widget file(
+  static Widget file<T extends Object>(
     String file, {
-    PolylineProperties polylineProperties = const PolylineProperties(),
-    Polyline Function(
-            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-        builder,
+    PolylineProperties<T>? polylineProperties,
+    Polyline<T> Function(
+      List<LatLng> points,
+      Map<String, Object?>? map,
+    )? builder,
     MapController? mapController,
     Future<String> Function(String)? fileLoadBuilder,
     Widget Function(int? statusCode)? fallback,
@@ -415,11 +420,11 @@ class PowerGeoJSONPolylines {
     if (AppPlatform.isWeb) {
       throw UnsupportedError('Unsupported platform: Web');
     }
-    return EnhancedFutureBuilder(
+    return EnhancedFutureBuilder<Widget>(
       future: _filePolylines(
         file,
         fileLoadBuilder: fileLoadBuilder ?? defaultFileLoadBuilder,
-        polylineProperties: polylineProperties,
+        polylineProperties: polylineProperties ?? PolylineProperties<T>(),
         builder: builder,
         fallback: fallback,
         mapController: mapController,
@@ -454,19 +459,20 @@ class PowerGeoJSONPolylines {
   /// polylines that are outside the map's viewport, improving performance.
   ///
   /// Returns a widget displaying the loaded polylines on the map.
-  static Widget memory(
+  static Widget memory<T extends Object>(
     Uint8List bytes, {
-    PolylineProperties polylineProperties = const PolylineProperties(),
-    Polyline Function(
-            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-        builder,
+    PolylineProperties<T>? polylineProperties,
+    Polyline<T> Function(
+      List<LatLng> points,
+      Map<String, Object?>? map,
+    )? builder,
     MapController? mapController,
     Key? key,
   }) {
-    return EnhancedFutureBuilder(
+    return EnhancedFutureBuilder<Widget>(
       future: _memoryPolylines(
         bytes,
-        polylineProperties: polylineProperties,
+        polylineProperties: polylineProperties ?? PolylineProperties<T>(),
         builder: builder,
         mapController: mapController,
         key: key,
@@ -500,18 +506,19 @@ class PowerGeoJSONPolylines {
   /// polylines that are outside the map's viewport, improving performance.
   ///
   /// Returns a widget displaying the loaded polylines on the map.
-  static Widget string(
+  static Widget string<T extends Object>(
     String data, {
-    PolylineProperties polylineProperties = const PolylineProperties(),
-    Polyline Function(
-            PolylineProperties polylineProperties, Map<String, dynamic>? map)?
-        builder,
+    PolylineProperties<T>? polylineProperties,
+    Polyline<T> Function(
+      List<LatLng> points,
+      Map<String, Object?>? map,
+    )? builder,
     MapController? mapController,
     Key? key,
   }) {
     return _string(
       data,
-      polylineProperties: polylineProperties,
+      polylineProperties: polylineProperties ?? PolylineProperties<T>(),
       builder: builder,
       key: key,
       mapController: mapController,

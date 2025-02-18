@@ -17,6 +17,7 @@ class FileGeoJSONPolygon extends StatelessWidget {
         ? SizedBox()
         : PowerGeoJSONPolygons.file(
             "/storage/emulated/0/Android/data/com.ymrabtipacks.power_geojson_example/files/files_polygons",
+            fallback: () => Card(child: Text('Untrouvé!')),
             polygonProperties: const PolygonProperties(
               layerProperties: {
                 LayerPolygonIndexes.label: 'Name',

@@ -10,14 +10,14 @@ class PowerEsriJsonTransformer {
   ///Still in the works:
   ///- parse all geometry types
 
-  Map esriToGeo(Map<String, Object?> esrijson) {
-    var geojson = {};
-    var features = esrijson["features"] as List;
-    var esriGeomType = esrijson["geometryType"];
+  Map<String, Object?> esriToGeo(Map<String, Object?> esrijson) {
+    Map<String, Object?> geojson = <String, Object?>{};
+    List<Map<String, Object?>> features = esrijson["features"] as List<Map<String, Object?>>;
+    String esriGeomType = '${esrijson["geometryType"]}';
     geojson["type"] = "FeatureCollection";
 
-    var feats = [];
-    for (var feat in features) {
+    List<Map<String, Object?>> feats = <Map<String, Object?>>[];
+    for (Map<String, Object?> feat in features) {
       feats.add(_extract(feat, esriGeomType));
     }
 
@@ -26,14 +26,14 @@ class PowerEsriJsonTransformer {
     return geojson;
   }
 
-  Object? _extract(feature, esriGeomType) {
-    var geomType = _getGeomType(esriGeomType);
+  Map<String, Object?> _extract(Map<String, Object?> feature, String esriGeomType) {
+    String geomType = _getGeomType(esriGeomType);
 
     return <String, Object?>{
       "type": "Feature",
-      "geometry": {
+      "geometry": <String, Object?>{
         "type": geomType,
-        "coordinates": _getCoordinates(feature["geometry"], geomType),
+        "coordinates": _getCoordinates(feature["geometry"] as Map<String, Object?>, geomType),
       },
       "properties": feature["attributes"],
     };
@@ -53,17 +53,20 @@ class PowerEsriJsonTransformer {
     }
   }
 
-  Object? _getCoordinates(geom, geomType) {
+  Object? _getCoordinates(Map<String, Object?> geom, String geomType) {
     if (geomType == "Polygon") {
       return geom["rings"];
     } else if (geomType == "LineString") {
       return geom["paths"];
     } else if (geomType == "Point") {
-      return [geom["x"], geom["y"]];
+      return <Map<String, Object?>>[
+        geom["x"] as Map<String, Object?>,
+        geom["y"] as Map<String, Object?>,
+      ];
     } else if (geomType == "MultiPoint") {
       return geom["points"];
     } else {
-      return [];
+      return <Map<String, Object?>>[];
     }
   }
 }

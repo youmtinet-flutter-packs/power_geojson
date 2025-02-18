@@ -1,19 +1,11 @@
-import 'dart:convert';
 import 'package:enhanced_future_builder/enhanced_future_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:power_geojson/power_geojson.dart';
 export 'properties.dart';
-
-const List<String> _esriFields = [
-  "displayFieldName",
-  "fieldAliases",
-  "geometryType",
-  "spatialReference",
-  "fields",
-];
 
 /// Loads polygons from a file and returns a widget for map display.
 ///
@@ -29,23 +21,23 @@ const List<String> _esriFields = [
 ///   },
 /// )
 /// ```
-Future<Widget> _filePolygons(
+Future<Widget> _filePolygons<T extends Object>(
   String file, {
-  Polygon Function(
-    List<List<List<double>>> coordinates,
+  Polygon<T> Function(
+    List<List<LatLng>> coordinates,
     Map<String, dynamic>? map,
   )? builder,
-  PolygonProperties? polygonProperties,
+  PolygonProperties<T>? polygonProperties,
   MapController? mapController,
   Key? key,
   required Future<String> Function(
     String filePath,
   ) fileLoadBuilder,
   bool polygonCulling = false,
-  required Widget Function(int? statusCode)? fallback,
+  required Widget Function()? fallback,
 }) async {
   try {
-    final string = await fileLoadBuilder(file);
+    final String string = await fileLoadBuilder(file);
     return _string(
       checkEsri(string),
       builder: builder,
@@ -55,17 +47,8 @@ Future<Widget> _filePolygons(
       key: key,
     );
   } catch (_) {
-    return fallback?.call(null) ?? const Text('Not Found');
+    return fallback?.call() ?? const Text('Not Found');
   }
-}
-
-String checkEsri(String readasstring) {
-  var map = jsonDecode(readasstring) as Map<String, Object?>;
-  var isEsri = map.keys.every((field) => _esriFields.contains(field));
-  var checkEsri = isEsri
-      ? PowerJSON(PowerEsriJSON().toGeoJSON(map)).toText()
-      : readasstring;
-  return checkEsri;
 }
 
 /// Loads polygons from memory data and returns a widget for map display.
@@ -82,12 +65,10 @@ String checkEsri(String readasstring) {
 ///   },
 /// )
 /// ```
-Future<Widget> _memoryPolygons(
+Future<Widget> _memoryPolygons<T extends Object>(
   Uint8List list, {
-  Polygon Function(
-          List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
-      builder,
-  PolygonProperties? polygonProperties,
+  Polygon<T> Function(List<List<LatLng>> coordinates, Map<String, dynamic>? map)? builder,
+  PolygonProperties<T>? polygonProperties,
   bool polygonCulling = false,
   Key? key,
   MapController? mapController,
@@ -117,12 +98,10 @@ Future<Widget> _memoryPolygons(
 ///   },
 /// )
 /// ```
-Future<Widget> _assetPolygons(
+Future<Widget> _assetPolygons<T extends Object>(
   String path, {
-  Polygon Function(
-          List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
-      builder,
-  PolygonProperties? polygonProperties,
+  Polygon<T> Function(List<List<LatLng>> coordinates, Map<String, dynamic>? map)? builder,
+  PolygonProperties<T>? polygonProperties,
   bool polygonCulling = false,
   Key? key,
   MapController? mapController,
@@ -152,23 +131,21 @@ Future<Widget> _assetPolygons(
 ///   },
 /// )
 /// ```
-Future<Widget> _networkPolygons(
+Future<Widget> _networkPolygons<T extends Object>(
   Uri urlString, {
-  Polygon Function(
-          List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
-      builder,
+  Polygon<T> Function(List<List<LatLng>> coordinates, Map<String, dynamic>? map)? builder,
   Client? client,
   Map<String, String>? headers,
   required List<int> statusCodes,
-  PolygonProperties? polygonProperties,
+  PolygonProperties<T>? polygonProperties,
   bool polygonCulling = false,
   Key? key,
   MapController? mapController,
   required Widget Function(int? statusCode)? fallback,
 }) async {
-  var method = client == null ? get : client.get;
-  var response = await method(urlString, headers: headers);
-  var string = response.body;
+  Future<Response> Function(Uri url, {Map<String, String>? headers}) method = client == null ? get : client.get;
+  Response response = await method(urlString, headers: headers);
+  String string = response.body;
   if (statusCodes.contains(response.statusCode)) {
     return _string(
       checkEsri(string),
@@ -179,8 +156,7 @@ Future<Widget> _networkPolygons(
       mapController: mapController,
     );
   } else {
-    return fallback?.call(response.statusCode) ??
-        Text('${response.statusCode}');
+    return fallback?.call(response.statusCode) ?? Text('${response.statusCode}');
   }
 }
 
@@ -198,33 +174,35 @@ Future<Widget> _networkPolygons(
 ///   },
 /// )
 /// ```
-PolygonLayer _string(
+PolygonLayer<T> _string<T extends Object>(
   String string, {
-  Polygon Function(
-          List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
-      builder,
+  Polygon<T> Function(List<List<LatLng>> coordinates, Map<String, dynamic>? map)? builder,
   // layer
   Key? key,
   bool polygonCulling = false,
-  PolygonProperties? polygonProperties,
+  PolygonProperties<T>? polygonProperties,
   MapController? mapController,
 }) {
-  final geojson = PowerGeoJSONFeatureCollection.fromJson(checkEsri(string));
+  final PowerGeoJSONFeatureCollection geojson = PowerGeoJSONFeatureCollection.fromJson(checkEsri(string));
 
-  var polygons = geojson.geoJSONPolygons.map(
-    (e) {
-      return builder != null
-          ? builder(e.geometry.coordinates, e.properties)
-          : e.geometry.coordinates.toPolygon(
-              polygonProperties: PolygonProperties.fromMap(
-                  e.properties, polygonProperties ?? const PolygonProperties()),
-            );
+  List<Polygon<T>> polygons = geojson.geoJSONPolygons.map(
+    (PowerGeoPolygon e) {
+      if (builder != null) {
+        return builder(
+          e.geometry.coordinates.map((List<List<double>> e) => e.toLatLng()).toList(),
+          e.properties,
+        );
+      } else {
+        return e.geometry.coordinates.toPolygon<T>(
+          polygonProps: PolygonProperties.fromMap<T>(e.properties, polygonProperties ?? PolygonProperties<T>()),
+        );
+      }
     },
   ).toList();
 
-  List<List<double>?> bbox = geojson.geoJSONPoints.map((e) => e.bbox).toList();
+  List<List<double>?> bbox = geojson.geoJSONPoints.map((PowerGeoPoint e) => e.bbox).toList();
   zoomTo(bbox, mapController);
-  return PolygonLayer(
+  return PolygonLayer<T>(
     polygons: polygons,
     key: key,
     polygonCulling: polygonCulling,
@@ -294,25 +272,22 @@ class PowerGeoJSONPolygons {
   ///   mapController: myMapController,
   /// )
   /// ```
-  static Widget network(
+  static Widget network<T extends Object>(
     String url, {
     Client? client,
-    List<int> statusCodes = const [200],
+    List<int> statusCodes = const <int>[200],
     Map<String, String>? headers,
     // layer
     Key? key,
     bool polygonCulling = false,
-    Polygon Function(
-            List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
-        builder,
-    PolygonProperties? polygonProperties,
+    Polygon<T> Function(List<List<LatLng>> coordinates, Map<String, dynamic>? map)? builder,
+    PolygonProperties<T>? polygonProperties,
     MapController? mapController,
     Widget Function(int? statusCode)? fallback,
   }) {
-    assert((builder == null && polygonProperties != null) ||
-        (polygonProperties == null && builder != null));
-    var uriString = url.toUri();
-    return EnhancedFutureBuilder(
+    assert((builder == null && polygonProperties != null) || (polygonProperties == null && builder != null));
+    Uri uriString = url.toUri();
+    return EnhancedFutureBuilder<Widget>(
       future: _networkPolygons(
         uriString,
         builder: builder,
@@ -346,20 +321,17 @@ class PowerGeoJSONPolygons {
   ///   ),
   /// )
   /// ```
-  static Widget asset(
+  static Widget asset<T extends Object>(
     String url, {
     // layer
     Key? key,
     bool polygonCulling = false,
-    Polygon Function(
-            List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
-        builder,
-    PolygonProperties? polygonProperties,
+    Polygon<T> Function(List<List<LatLng>> coordinates, Map<String, dynamic>? map)? builder,
+    PolygonProperties<T>? polygonProperties,
     MapController? mapController,
   }) {
-    assert((builder == null && polygonProperties != null) ||
-        (polygonProperties == null && builder != null));
-    return EnhancedFutureBuilder(
+    assert((builder == null && polygonProperties != null) || (polygonProperties == null && builder != null));
+    return EnhancedFutureBuilder<Widget>(
       future: _assetPolygons(
         url,
         builder: builder,
@@ -388,26 +360,23 @@ class PowerGeoJSONPolygons {
   ///   ),
   /// )
   /// ```
-  static Widget file(
+  static Widget file<T extends Object>(
     String path, {
     // layer
     Key? key,
     bool polygonCulling = false,
-    PolygonProperties? polygonProperties,
+    PolygonProperties<T>? polygonProperties,
     Future<String> Function(String)? fileLoadBuilder,
-    Polygon Function(
-            List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
-        builder,
+    Polygon<T> Function(List<List<LatLng>> coordinates, Map<String, dynamic>? map)? builder,
     MapController? mapController,
-    Widget Function(int? statusCode)? fallback,
+    Widget Function()? fallback,
   }) {
-    assert((builder == null && polygonProperties != null) ||
-        (polygonProperties == null && builder != null));
+    assert((builder == null && polygonProperties != null) || (polygonProperties == null && builder != null));
 
     if (AppPlatform.isWeb) {
       throw UnsupportedError('Unsupported platform: Web');
     }
-    return EnhancedFutureBuilder(
+    return EnhancedFutureBuilder<Widget>(
       future: _filePolygons(
         fileLoadBuilder: fileLoadBuilder ?? defaultFileLoadBuilder,
         path,
@@ -436,23 +405,22 @@ class PowerGeoJSONPolygons {
   ///   polygonCulling: true,
   /// )
   /// ```
-  static Widget memory(
+  static Widget memory<T extends Object>(
     Uint8List bytes, {
     // layer
     Key? key,
     bool polygonCulling = false,
-    PolygonProperties? polygonProperties,
-    Polygon Function(
-      List<List<List<double>>> coordinates,
+    PolygonProperties<T>? polygonProperties,
+    Polygon<T> Function(
+      List<List<LatLng>> coordinates,
       Map<String, dynamic>? map,
     )? builder,
     MapController? mapController,
   }) {
     assert(
-      (builder == null && polygonProperties != null) ||
-          (polygonProperties == null && builder != null),
+      (builder == null && polygonProperties != null) || (polygonProperties == null && builder != null),
     );
-    return EnhancedFutureBuilder(
+    return EnhancedFutureBuilder<Widget>(
       future: _memoryPolygons(
         bytes,
         builder: builder,
@@ -479,19 +447,16 @@ class PowerGeoJSONPolygons {
   ///   mapController: myMapController,
   /// )
   /// ```
-  static PolygonLayer string(
+  static PolygonLayer<T> string<T extends Object>(
     String data, {
     // layer
     Key? key,
     bool polygonCulling = false,
-    Polygon Function(
-            List<List<List<double>>> coordinates, Map<String, dynamic>? map)?
-        builder,
-    PolygonProperties? polygonProperties,
+    Polygon<T> Function(List<List<LatLng>> coordinates, Map<String, dynamic>? map)? builder,
+    PolygonProperties<T>? polygonProperties,
     MapController? mapController,
   }) {
-    assert((builder == null && polygonProperties != null) ||
-        (polygonProperties == null && builder != null));
+    assert((builder == null && polygonProperties != null) || (polygonProperties == null && builder != null));
     return _string(
       data,
       builder: builder,

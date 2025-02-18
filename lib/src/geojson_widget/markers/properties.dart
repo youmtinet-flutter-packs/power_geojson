@@ -100,18 +100,15 @@ class MarkerProperties {
     Map<String, dynamic>? properties,
     MarkerProperties markerLayerProperties,
   ) {
-    var layerMarkerProperties = markerLayerProperties.layerProperties;
+    Map<LayerMarkerIndexes, String>? layerMarkerProperties = markerLayerProperties.layerProperties;
     if (properties != null && layerMarkerProperties != null) {
-      final String? keyPropertieWidth =
-          layerMarkerProperties[LayerMarkerIndexes.width];
+      final String? keyPropertieWidth = layerMarkerProperties[LayerMarkerIndexes.width];
       double? propWidth = properties[keyPropertieWidth];
 
-      final String? keyPropertieHeight =
-          layerMarkerProperties[LayerMarkerIndexes.height];
+      final String? keyPropertieHeight = layerMarkerProperties[LayerMarkerIndexes.height];
       double? propHeight = properties[keyPropertieHeight];
 
-      final String? keyPropertieRotate =
-          layerMarkerProperties[LayerMarkerIndexes.rotate];
+      final String? keyPropertieRotate = layerMarkerProperties[LayerMarkerIndexes.rotate];
       bool? propRotate = properties[keyPropertieRotate];
 
       return MarkerProperties(

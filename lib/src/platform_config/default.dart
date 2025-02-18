@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 Future<String> strUint8List(Uint8List list) async {
   File file = File.fromRawPath(list);
-  var string = await file.readAsString();
+  String string = await file.readAsString();
   return string;
 }
 
@@ -15,10 +15,10 @@ Future<String> strUint8List(Uint8List list) async {
 ///
 /// Returns a [Future] that completes with the contents of the file as a string.
 Future<String> defaultFileLoadBuilder(String path) async {
-  final file = File(path);
-  var exists = await file.exists();
+  final File file = File(path);
+  bool exists = await file.exists();
   if (exists) {
-    var readAsString = await file.readAsString();
+    String readAsString = await file.readAsString();
     return readAsString;
   }
   return throw Exception('File not found');

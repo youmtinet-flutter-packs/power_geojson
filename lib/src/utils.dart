@@ -36,18 +36,18 @@ export 'dart:developer';
 ///
 /// This function modifies the map view to display all the specified features.
 void zoomTo(List<List<double>?> features, MapController? mapController) {
-  var atLeast = features.firstWhereOrNull((fe) => fe != null);
+  List<double>? atLeast = features.firstWhereOrNull((List<double>? fe) => fe != null);
   if (atLeast == null) return;
   if (mapController == null) return;
-  var firstBounds = LatLngBounds.fromPoints([
+  LatLngBounds firstBounds = LatLngBounds.fromPoints(<LatLng>[
     LatLng(atLeast[1], atLeast[0]),
     LatLng(atLeast[3], atLeast[2]),
   ]);
-  var latLngBounds = features.fold<LatLngBounds>(
+  LatLngBounds latLngBounds = features.fold<LatLngBounds>(
     firstBounds,
-    (previousValue, bbox) {
+    (LatLngBounds previousValue, List<double>? bbox) {
       if (bbox == null) return previousValue;
-      var elementBounds = LatLngBounds.fromPoints([
+      LatLngBounds elementBounds = LatLngBounds.fromPoints(<LatLng>[
         LatLng(bbox[1], bbox[0]),
         LatLng(bbox[3], bbox[2]),
       ]);

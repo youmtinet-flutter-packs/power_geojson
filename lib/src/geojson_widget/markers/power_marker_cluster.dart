@@ -60,15 +60,12 @@ class PowerPopupOptions {
     MarkerTapBehavior? markerTapBehavior,
     this.buildPopupOnHover = false,
     this.timeToShowPopupOnHover = 300,
-  }) : markerTapBehavior =
-            markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest();
+  }) : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest();
 }
 
 // In a separate file so it can be exported individually in extension_api.dart
-typedef PowerPopupBuilder = Widget Function(
-    BuildContext context, PowerMarker powerMarker);
-typedef PowerClusterWidgetBuilder = Widget Function(
-    BuildContext context, List<PowerMarker> markers);
+typedef PowerPopupBuilder = Widget Function(BuildContext context, PowerMarker powerMarker);
+typedef PowerClusterWidgetBuilder = Widget Function(BuildContext context, List<PowerMarker> markers);
 
 class PowerMarkerClusterOptions {
   //
@@ -116,8 +113,7 @@ class PowerMarkerClusterOptions {
   final int circleSpiralSwitchover;
 
   /// Make it possible to provide custom function to calculate spiderfy shape positions
-  final List<Point<double>> Function(int, Point<double>)?
-      spiderfyShapePositions;
+  final List<Point<double>> Function(int, Point<double>)? spiderfyShapePositions;
 
   /// If true show polygon then tap on cluster
   final bool showPolygon;
@@ -194,12 +190,9 @@ class PowerMarkerClusterOptions {
     this.markerChildBehavior = false,
   });
 
-  MarkerClusterLayerOptions toClusterOptions(
-      PowerMarkerClusterOptions powerClusterOptions,
-      List<PowerMarker> markers) {
+  MarkerClusterLayerOptions toClusterOptions(PowerMarkerClusterOptions powerClusterOptions, List<PowerMarker> markers) {
     return MarkerClusterLayerOptions(
-      builder: (context, markers) =>
-          builder(context, markers.whereType<PowerMarker>().toList()),
+      builder: (BuildContext context, List<Marker> markers) => builder(context, markers.whereType<PowerMarker>().toList()),
       rotate: rotate,
       markers: markers,
       size: size,
@@ -235,29 +228,22 @@ class PowerMarkerClusterOptions {
         popupController: popupOptions?.popupController,
         popupSnap: popupOptions?.popupSnap ?? PopupSnap.markerTop,
         timeToShowPopupOnHover: popupOptions?.timeToShowPopupOnHover ?? 300,
-        popupBuilder: (_, marker) =>
-            _markerBuilder(powerClusterOptions, marker),
+        popupBuilder: (_, Marker marker) => _markerBuilder(powerClusterOptions, marker),
       ),
       markerChildBehavior: markerChildBehavior,
     );
   }
 
-  PopupMarkerLayerOptions toPopupOptions(
-      PowerMarkerClusterOptions powerClusterOptions,
-      List<PowerMarker> markers) {
+  PopupMarkerLayerOptions toPopupOptions(PowerMarkerClusterOptions powerClusterOptions, List<PowerMarker> markers) {
     return PopupMarkerLayerOptions(
       markers: markers,
       markerTapBehavior: popupOptions?.markerTapBehavior,
       popupController: popupOptions?.popupController,
-      selectedMarkerBuilder: (context, marker) {
-        return SizedBox(
-            width: 45,
-            height: 45,
-            child: _markerBuilder /**/ (powerClusterOptions, marker));
+      selectedMarkerBuilder: (BuildContext context, Marker marker) {
+        return SizedBox(width: 45, height: 45, child: _markerBuilder /**/ (powerClusterOptions, marker));
       },
       popupDisplayOptions: PopupDisplayOptions(
-        builder: (context, marker) =>
-            _markerBuilder /**/ (powerClusterOptions, marker),
+        builder: (BuildContext context, Marker marker) => _markerBuilder /**/ (powerClusterOptions, marker),
         animation: popupOptions?.popupAnimation,
         snap: popupOptions?.popupSnap ?? PopupSnap.markerTop,
       ),
@@ -267,11 +253,10 @@ class PowerMarkerClusterOptions {
     );
   }
 
-  Widget _markerBuilder(
-      PowerMarkerClusterOptions powerClusterOptions, Marker marker) {
+  Widget _markerBuilder(PowerMarkerClusterOptions powerClusterOptions, Marker marker) {
     PowerPopupOptions? popupOptions = powerClusterOptions.popupOptions;
     if ((marker is PowerMarker && popupOptions != null)) {
-      return Builder(builder: (context) {
+      return Builder(builder: (BuildContext context) {
         return popupOptions.popupBuilder(context, marker);
       });
     } else {

@@ -4,22 +4,22 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' hide Path;
 import 'package:power_geojson/power_geojson.dart';
 
-class PowerGeoJSONClipper extends CustomClipper<Path> {
-  final Polygon polygon;
+class PowerGeoJSONClipper<T extends Object> extends CustomClipper<Path> {
+  final Polygon<T> polygon;
   PowerGeoJSONClipper({required this.polygon});
   @override
   Path getClip(Size size) {
     Path path = Path();
     String d = '';
 
-    double minLats = polygon.points.map((e) => e.latitude).toList().min;
-    double minLngs = polygon.points.map((e) => e.longitude).toList().min;
-    double maxLats = polygon.points.map((e) => e.latitude).toList().max;
-    double maxLngs = polygon.points.map((e) => e.longitude).toList().max;
+    double minLats = polygon.points.map((LatLng e) => e.latitude).toList().min;
+    double minLngs = polygon.points.map((LatLng e) => e.longitude).toList().min;
+    double maxLats = polygon.points.map((LatLng e) => e.latitude).toList().max;
+    double maxLngs = polygon.points.map((LatLng e) => e.longitude).toList().max;
 
-    polygon.points.forEachIndexed((i, e) {
-      var lng = (e.longitude - minLngs) / (maxLngs - minLngs) * size.width;
-      var lat = (maxLats - e.latitude) / (maxLats - minLats) * size.height;
+    polygon.points.forEachIndexed((int i, LatLng e) {
+      double lng = (e.longitude - minLngs) / (maxLngs - minLngs) * size.width;
+      double lat = (maxLats - e.latitude) / (maxLats - minLats) * size.height;
       if (i == 0) {
         path.moveTo(lng, lat);
         d += 'M$lng $lat';
@@ -29,10 +29,10 @@ class PowerGeoJSONClipper extends CustomClipper<Path> {
       }
     });
     d += 'Z';
-    for (var hole in (polygon.holePointsList ?? <List<LatLng>>[])) {
-      hole.forEachIndexed((i, e) {
-        var lng = (e.longitude - minLngs) / (maxLngs - minLngs) * size.width;
-        var lat = (maxLats - e.latitude) / (maxLats - minLats) * size.height;
+    for (List<LatLng> hole in (polygon.holePointsList ?? <List<LatLng>>[])) {
+      hole.forEachIndexed((int i, LatLng e) {
+        double lng = (e.longitude - minLngs) / (maxLngs - minLngs) * size.width;
+        double lat = (maxLats - e.latitude) / (maxLats - minLats) * size.height;
         if (i == 0) {
           path.moveTo(lng, lat);
           d += 'M$lng $lat';

@@ -3,20 +3,21 @@ import 'package:power_geojson/power_geojson.dart';
 
 extension PolylineXX on List<List<double>> {
   /// Converts a list coords of a Polyline into a [Polyline]
-  Polyline toPolyline(
-      {PolylineProperties polylineProperties = const PolylineProperties()}) {
-    var polyline = Polyline(
-      colorsStop: polylineProperties.colorsStop,
-      gradientColors: polylineProperties.gradientColors,
-      strokeWidth: polylineProperties.strokeWidth,
-      useStrokeWidthInMeter: polylineProperties.useStrokeWidthInMeter,
+  Polyline<T> toPolyline<T extends Object>({PolylineProperties<T>? polylineProperties}) {
+    PolylineProperties<T> poly = polylineProperties ?? PolylineProperties<T>();
+    Polyline<T> polyline = Polyline<T>(
       points: toLatLng(),
-      color: polylineProperties.color,
-      borderColor: polylineProperties.borderColor,
-      borderStrokeWidth: polylineProperties.borderStrokeWidth,
-      pattern: polylineProperties.isDotted,
-      strokeCap: polylineProperties.strokeCap,
-      strokeJoin: polylineProperties.strokeJoin,
+      colorsStop: poly.colorsStop,
+      gradientColors: poly.gradientColors,
+      strokeWidth: poly.strokeWidth,
+      useStrokeWidthInMeter: poly.useStrokeWidthInMeter,
+      color: poly.color,
+      borderColor: poly.borderColor,
+      borderStrokeWidth: poly.borderStrokeWidth,
+      pattern: poly.isDotted,
+      strokeCap: poly.strokeCap,
+      strokeJoin: poly.strokeJoin,
+      hitValue: poly.hintValue,
     );
     // consoleLog(polyline.area(), color: 35);
     return polyline;

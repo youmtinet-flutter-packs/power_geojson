@@ -1,4 +1,18 @@
 include: package:flutter_lints/flutter.yaml
-
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+linter:
+    rules:
+        prefer_const_constructors: false
+        prefer_const_literals_to_create_immutables: false
+        valid_regexps: false
+        always_declare_return_types: true
+        prefer_const_constructors_in_immutables: false
+        prefer_final_fields: false
+        camel_case_types: false
+        camel_case_extensions: false
+        non_constant_identifier_names: false
+        no_leading_underscores_for_local_identifiers: false
+        library_annotations: true
+        constant_identifier_names: false
+        type_annotate_public_apis: true
+        always_specify_types: true
+        avoid_relative_lib_imports: true

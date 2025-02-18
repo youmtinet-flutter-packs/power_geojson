@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 class PowerEsriJsonTransform {
-  _stripJSON(String str) {
+  String _stripJSON(String str) {
     return str.replaceAll('\\n', "\n").replaceAll('\\t', "\t");
   }
 
   Map<String, dynamic> _jsonToObject(String stringIn) {
-    Map<String, dynamic> data = {};
+    Map<String, dynamic> data = <String, Object?>{};
     try {
       data = json.decode(_stripJSON(stringIn));
     } catch (err) {
@@ -30,13 +30,12 @@ class PowerEsriJsonTransform {
     }
   }
 
-  Map<String, Object?> _featureToGeo(
-      Map<String, dynamic> featureIn, String geomType) {
-    Map<String, dynamic> geometry = {};
+  Map<String, Object?> _featureToGeo(Map<String, dynamic> featureIn, String geomType) {
+    Map<String, dynamic> geometry = <String, Object?>{};
     geometry['type'] = geomType;
 
     // grab the rings to coordinates
-    var geom = featureIn['geometry'];
+    Map<String, Object?> geom = featureIn['geometry'];
 
     dynamic coordinates;
     if (geomType == "Polygon") {
@@ -44,18 +43,21 @@ class PowerEsriJsonTransform {
     } else if (geomType == "LineString") {
       coordinates = geom['paths'];
     } else if (geomType == "Point") {
-      coordinates = [geom['x'], geom['y']];
+      coordinates = <Map<String, Object?>>[
+        geom['x'] as Map<String, Object?>,
+        geom['y'] as Map<String, Object?>,
+      ];
     }
     geometry['coordinates'] = coordinates;
 
     // convert attributes to properties
-    var properties = {};
-    var attr = featureIn['attributes'] as Map<String, dynamic>;
-    for (var field in attr.keys) {
+    Map<String, Object?> properties = <String, Object?>{};
+    Map<String, dynamic> attr = featureIn['attributes'] as Map<String, dynamic>;
+    for (String field in attr.keys) {
       properties[field] = attr[field];
     }
 
-    var featureOut = <String, Object?>{};
+    Map<String, Object?> featureOut = <String, Object?>{};
     featureOut['type'] = "Feature";
     featureOut['geometry'] = geometry;
     featureOut['properties'] = properties;
@@ -63,23 +65,28 @@ class PowerEsriJsonTransform {
     return featureOut;
   }
 
-  Map<String, Object?> deserialize(js) {
-    var o = _jsonToObject(js);
-    var geomType = _parseGeometryType(o['geometryType']);
+  Map<String, Object?> deserialize(String js) {
+    Map<String, dynamic> o = _jsonToObject(js);
+    String geomType = _parseGeometryType(o['geometryType']);
 
-    var features = [];
-    var o2 = o['features'] as List<dynamic>;
-    for (var i = 0,
-            feature = {'string': '', 'int': 0, 'object': {}, 'null': null};
+    List<Map<String, Object?>> features = <Map<String, Object?>>[];
+    List<Map<String, Object?>> o2 = o['features'] as List<Map<String, Object?>>;
+    for (dynamic i = 0,
+            feature = <String, Object?>{
+      'string': '',
+      'int': 0,
+      'object': <String, Object?>{},
+      'null': null,
+    };
         i < o2.length;
         i++) {
       // prepare the main parts of the GeoJSON
       feature = o2[i];
-      var feat = _featureToGeo(feature, geomType);
+      Map<String, Object?> feat = _featureToGeo(feature, geomType);
       features.add(feat);
     }
 
-    var featColl = <String, Object?>{};
+    Map<String, Object?> featColl = <String, Object?>{};
     featColl['type'] = "FeatureCollection";
     featColl['features'] = features;
 

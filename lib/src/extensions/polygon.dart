@@ -13,25 +13,23 @@ extension PointXList on List<double> {
 
 extension XListPoint on LatLng {
   List<double> toList() {
-    return [longitude, latitude];
+    return <double>[longitude, latitude];
   }
 }
 
 extension ListABC<T> on List<T> {
   /// Returns the first element that matches the test; if none is found, it returns null.
   T? firstWhereOrNull(bool Function(T) test) {
-    var first = where(test);
+    Iterable<T> first = where(test);
     return first.isEmpty ? null : first.first;
   }
 }
 
-extension PolyX on Polygon {
+extension PolyX<T extends Object> on Polygon<T> {
   bool isPointInsidePolygon(LatLng position) {
-    var list = [
-      points.map((e) => e.toList()).toList(),
-      ...(holePointsList ?? [])
-          .map((e) => e.map((f) => f.toList()).toList())
-          .toList(),
+    List<List<List<double>>> list = <List<List<double>>>[
+      points.map((LatLng e) => e.toList()).toList(),
+      ...(holePointsList ?? <List<LatLng>>[]).map((List<LatLng> e) => e.map((LatLng f) => f.toList()).toList()).toList(),
     ];
     return list.isGeoPointInPolygon(position);
   }
@@ -39,16 +37,12 @@ extension PolyX on Polygon {
 
 extension ListListLatLngX on List<List<List<double>>> {
   bool isGeoPointInPolygon(LatLng position) {
-    var isInPolygon = false;
-    var points = first.toLatLng();
+    bool isInPolygon = false;
+    List<LatLng> points = first.toLatLng();
 
-    for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
-      bool latCheck = (points[i].latitude > position.latitude) !=
-          (points[j].latitude > position.latitude);
-      double intersectLongitude = (points[j].longitude - points[i].longitude) *
-              (position.latitude - points[i].latitude) /
-              (points[j].latitude - points[i].latitude) +
-          points[i].longitude;
+    for (int i = 0, j = points.length - 1; i < points.length; j = i++) {
+      bool latCheck = (points[i].latitude > position.latitude) != (points[j].latitude > position.latitude);
+      double intersectLongitude = (points[j].longitude - points[i].longitude) * (position.latitude - points[i].latitude) / (points[j].latitude - points[i].latitude) + points[i].longitude;
       if (latCheck && position.longitude < intersectLongitude) {
         isInPolygon = !isInPolygon;
       }
@@ -58,54 +52,42 @@ extension ListListLatLngX on List<List<List<double>>> {
 
   bool isPointInsidePolygon(LatLng position) {
     bool outHoles = length > 1
-        ? sublist(1).map((e) {
-            return ![e]._isPointInsidePolygon(position);
-          }).every((e) => e)
+        ? sublist(1).map((List<List<double>> e) {
+            return !<List<List<double>>>[e]._isPointInsidePolygon(position);
+          }).every((bool e) => e)
         : true;
     return _isPointInsidePolygon(position) && outHoles;
   }
 
   bool _isPointInsidePolygon(LatLng position) {
-    var points = first;
+    List<List<double>> points = first;
     // Check if the point sits exactly on a vertex
     // var vertexPosition = points.firstWhere((point) => point == position, orElse: () => null);
-    LatLng? vertexPosition = points
-        .firstWhereOrNull((point) => point.toLatLng() == position)
-        ?.toLatLng();
+    LatLng? vertexPosition = points.firstWhereOrNull((List<double> point) => point.toLatLng() == position)?.toLatLng();
     if (vertexPosition != null) {
       return true;
     }
 
     // Check if the point is inside the polygon or on the boundary
     int intersections = 0;
-    var verticesCount = points.length;
+    int verticesCount = points.length;
 
     for (int i = 1; i < verticesCount; i++) {
       LatLng vertex1 = points[i - 1].toLatLng();
       LatLng vertex2 = points[i].toLatLng();
 
       // Check if point is on an horizontal polygon boundary
-      if (vertex1.latitude == vertex2.latitude &&
-          vertex1.latitude == position.latitude &&
-          position.longitude > min(vertex1.longitude, vertex2.longitude) &&
-          position.longitude < max(vertex1.longitude, vertex2.longitude)) {
+      if (vertex1.latitude == vertex2.latitude && vertex1.latitude == position.latitude && position.longitude > min(vertex1.longitude, vertex2.longitude) && position.longitude < max(vertex1.longitude, vertex2.longitude)) {
         return true;
       }
 
-      if (position.latitude > min(vertex1.latitude, vertex2.latitude) &&
-          position.latitude <= max(vertex1.latitude, vertex2.latitude) &&
-          position.longitude <= max(vertex1.longitude, vertex2.longitude) &&
-          vertex1.latitude != vertex2.latitude) {
-        var xinters = (position.latitude - vertex1.latitude) *
-                (vertex2.longitude - vertex1.longitude) /
-                (vertex2.latitude - vertex1.latitude) +
-            vertex1.longitude;
+      if (position.latitude > min(vertex1.latitude, vertex2.latitude) && position.latitude <= max(vertex1.latitude, vertex2.latitude) && position.longitude <= max(vertex1.longitude, vertex2.longitude) && vertex1.latitude != vertex2.latitude) {
+        double xinters = (position.latitude - vertex1.latitude) * (vertex2.longitude - vertex1.longitude) / (vertex2.latitude - vertex1.latitude) + vertex1.longitude;
         if (xinters == position.longitude) {
           // Check if point is on the polygon boundary (other than horizontal)
           return true;
         }
-        if (vertex1.longitude == vertex2.longitude ||
-            position.longitude <= xinters) {
+        if (vertex1.longitude == vertex2.longitude || position.longitude <= xinters) {
           intersections++;
         }
       }
@@ -118,13 +100,14 @@ extension ListListLatLngX on List<List<List<double>>> {
 
 extension PolygonsXX on List<List<List<double>>> {
   /// Converts a list coords of a Polygon into a [Polygon]
-  Polygon toPolygon(
-      {PolygonProperties polygonProperties = const PolygonProperties()}) {
-    var holes = sublist(1).map((f) => f.toLatLng()).toList();
-    var polygon = Polygon(
+  Polygon<T> toPolygon<T extends Object>({PolygonProperties<T>? polygonProps}) {
+    PolygonProperties<T> polygonProperties = polygonProps ?? PolygonProperties<T>();
+    List<List<LatLng>> holes = sublist(1).map((List<List<double>> f) => f.toLatLng()).toList();
+    Polygon<T> polygon = Polygon<T>(
       points: first.toLatLng(),
       holePointsList: holes,
       color: polygonProperties.fillColor,
+      hitValue: polygonProperties.hintValue,
       borderColor: polygonProperties.borderColor,
       borderStrokeWidth: polygonProperties.borderStokeWidth,
       disableHolesBorder: polygonProperties.disableHolesBorder,

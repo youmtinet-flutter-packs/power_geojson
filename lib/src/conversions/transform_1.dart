@@ -1,10 +1,31 @@
+// ignore_for_file: always_specify_types
+
 import 'dart:convert';
 
 import 'package:console_tools/console_tools.dart';
+import 'package:power_geojson/power_geojson.dart';
+
+const List<String> _esriFields = <String>[
+  "displayFieldName",
+  "fieldAliases",
+  "geometryType",
+  "spatialReference",
+  "fields",
+];
+
+String checkEsri(String readasstring) {
+  Map<String, Object?> map = jsonDecode(readasstring) as Map<String, Object?>;
+  bool isEsri = map.keys.every((String field) => _esriFields.contains(field));
+  String checkEsri = isEsri ? PowerJSON(PowerEsriJSON(map).toGeoJSON()).toText() : readasstring;
+  return checkEsri;
+}
 
 class PowerEsriJSON {
-  toGeoJSON(Map<String, dynamic> data) {
-    var outPut = {"type": "FeatureCollection", "features": []};
+  final Map<String, dynamic> data;
+
+  PowerEsriJSON(this.data);
+  Map<String, Object?> toGeoJSON() {
+    var output = {"type": "FeatureCollection", "features": []};
     var data2 = data['features'];
     var fl = data2.length;
     var i = 0;
@@ -25,15 +46,16 @@ class PowerEsriJSON {
       } else if (geometry['rings'] != null) {
         outFT['geometry'] = _polygon(geometry);
       }
-      var outPut2 = outPut['features'] as List;
+      var outPut2 = output['features'] as List;
       outPut2.add(outFT);
       i++;
     }
-    Console.log('outPut = ${json.encode(outPut)}');
+    Console.log('outPut = ${json.encode(output)}');
+    return output;
   }
 
 // \.(points|x|y|paths|rings)
-  _point2D(geometry) {
+  Map<String, Object?> _point2D(geometry) {
     //this one is easy
     return {
       "type": "Point",
@@ -41,7 +63,7 @@ class PowerEsriJSON {
     };
   }
 
-  _points2D(geometry) {
+  Map<String, Object?> _points2D(geometry) {
     //checks if the multipoint only has one point, if so exports as point instead
     if (geometry['points'].length == 1) {
       return {"type": "Point", "coordinates": geometry['points'][0]};
@@ -50,7 +72,7 @@ class PowerEsriJSON {
     }
   }
 
-  _line2D(geometry) {
+  Map<String, Object?> _line2D(geometry) {
     //checks if their are multiple paths or just one
     if (geometry['paths'].length == 1) {
       return {"type": "LineString", "coordinates": geometry['paths'][0]};
@@ -59,7 +81,7 @@ class PowerEsriJSON {
     }
   }
 
-  _polygon(geometry) {
+  Map<String, Object?> _polygon(geometry) {
     //first we check for some easy cases, like if their is only one ring
     if (geometry['rings'].length == 1) {
       return {"type": "Polygon", "coordinates": geometry['rings']};
@@ -71,7 +93,7 @@ class PowerEsriJSON {
     }
   }
 
-  _decodePolygon(a) {
+  Map<String, Object?> _decodePolygon(a) {
     //returns the feature
     var coords = [];
     String type;
@@ -93,13 +115,10 @@ class PowerEsriJSON {
     } else {
       type = "MultiPolygon";
     }
-    return {
-      "type": type,
-      "coordinates": (coords.length == 1) ? coords[0] : coords
-    };
+    return {"type": type, "coordinates": (coords.length == 1) ? coords[0] : coords};
   }
 
-  _ringIsClockwise(ringToTest) {
+  bool _ringIsClockwise(ringToTest) {
     var total = 0, i = 0, rLength = ringToTest.length, pt1 = ringToTest[i];
     List<int> pt2;
     for (int i = 0; i < rLength - 1; i++) {
@@ -114,7 +133,7 @@ class PowerEsriJSON {
     return (total >= 0);
   }
 
-  _prop(Map<String, dynamic> a) {
+  Map<dynamic, Object?> _prop(Map<String, dynamic> a) {
     var p = {};
     for (var k in a.keys) {
       if (a[k] != null) {
